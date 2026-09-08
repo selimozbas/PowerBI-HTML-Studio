@@ -18,8 +18,18 @@
         overflow: auto;
     }
 
-    .hf-row {
+    .hf-row,
+    [data-hf-select] {
         transition: opacity 120ms ease;
+    }
+
+    [data-hf-select] {
+        cursor: pointer;
+    }
+
+    [data-hf-select].hf-selected {
+        outline: 2px solid var(--hf-accent, #118dff);
+        outline-offset: 1px;
     }
 
     .hf-empty,

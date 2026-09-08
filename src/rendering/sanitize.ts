@@ -54,6 +54,7 @@ export function sanitizeToFragment(html: string, opts: SanitizeOptions): Sanitiz
         ADD_ATTR: [
             "target",
             "data-hf-row",
+            "data-hf-select",
             "data-hf-tab",
             "data-hf-tabs",
             "data-hf-panel",

@@ -24,6 +24,10 @@ export function buildHelpers(locale = "en-US"): Record<string, Helper> {
             return Math.round(Number(v) * f) / f;
         },
         json: (v) => JSON.stringify(v),
+        selectAttr: (field, value) => {
+            const spec = value === undefined ? String(field ?? "") : `${String(field)}:${String(value ?? "")}`;
+            return `data-hf-select="${spec.replace(/"/g, "&quot;")}"`;
+        },
         sparkline: (v, w, h) => sparkline(v, num(w, 80), num(h, 20)),
         bar: (v, max, w, h) => bar(Number(v), num(max, 100), num(w, 100), num(h, 10)),
         ring: (v, max, size) => ring(Number(v), num(max, 100), num(size, 36)),

@@ -14,15 +14,26 @@ a lot more built in.
 | Content | CSP-safe **templating engine** — `{{field}}`, `{{#each rows}}`, `{{#if a > b}}`, helpers (`format`, `bar`, `ring`, `sparkline`, `rating`, math/string) |
 | Content | **Named data fields** — drop extra measures in *Data* and reference them as `{{Revenue}}`; no DAX string concatenation |
 | Styling | **Rule-based conditional formatting** authored as JSON, applied per row without DAX |
+| Content | **Markdown mode** — GitHub-flavoured, per row or per block, still sanitised |
 | Interactivity | **Sandbox-safe components** — tabs & accordion via `data-` attributes, state persisted with `persistProperties` |
-| Interactivity | Click-to-cross-filter with dimming, right-click context menu, `http(s)` links via `launchUrl` |
+| Interactivity | Cross-filter by row **or by field value** (`data-hf-select="Region:North"`), multi-select, dimming, right-click context menu, `http(s)` links via `launchUrl` |
+| Interactivity | Default Power BI **tooltips** for measures in the Tooltips field well |
 | Theming | Active report theme exposed as CSS variables (`--hf-accent`, `--hf-foreground`, …) |
 | Security | **DOMPurify** sanitisation with a configurable allow-list; inline `<script>` only behind an explicit unsafe toggle |
 | DX | In-visual **diagnostics panel**: template errors, sanitiser removals, available field names |
 
-Planned next: Markdown mode, Monaco advanced editor + template gallery, richer
-`data-*` cross-filter mapping, drill-through / bookmark triggers, full RTL &
-locale helpers, `@font-face` embedding.
+Planned next: Monaco advanced editor + template gallery, RTL & locale number
+helpers, `@font-face` embedding, DOM virtualization for very large tables.
+
+### Authoring hooks (data- attributes)
+
+| Attribute | Effect |
+| --- | --- |
+| `data-hf-select="Field:Value"` (`; Field2:Value2` to AND) | click cross-filters every row where the field(s) match; ctrl/⌘-click adds |
+| `data-hf-tabs="id"` + `data-hf-tab="k"` / `data-hf-panel="k"` | tab group |
+| `data-hf-acc="id"` + `data-hf-acc-panel="id"` | accordion section |
+
+Template helper `{{{selectAttr("Region", Region)}}}` emits the first one.
 
 ## Repository layout
 
