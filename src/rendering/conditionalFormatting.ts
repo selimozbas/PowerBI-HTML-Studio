@@ -20,6 +20,8 @@
  * evaluateRules returns an inline `style` string + class names for a row.
  */
 
+import { parseNumeric, toDate, hexToRgb } from "./numeric";
+
 export interface CfScale {
     field?: string;
     min: number;
@@ -94,34 +96,37 @@ export function evaluateRules(rules: CfRule[], row: Record<string, unknown>): Cf
 }
 
 function scaleColor(scale: CfScale, value: number): string {
-    if (isNaN(value)) return "";
-    const clamp = (t: number) => Math.max(0, Math.min(1, t));
+    const min = Number(scale.min);
+    const max = Number(scale.max);
+    if (isNaN(value) || isNaN(min) || isNaN(max)) return "";
+    const clamp = (t: number) => (isNaN(t) ? 0 : Math.max(0, Math.min(1, t)));
     if (scale.midColor !== undefined && scale.mid !== undefined) {
-        if (value <= scale.mid) {
-            return mix(scale.minColor, scale.midColor, clamp((value - scale.min) / (scale.mid - scale.min || 1)));
+        const mid = Number(scale.mid);
+        if (value <= mid) {
+            return mix(scale.minColor, scale.midColor, clamp((value - min) / (mid - min || 1)));
         }
-        return mix(scale.midColor, scale.maxColor, clamp((value - scale.mid) / (scale.max - scale.mid || 1)));
+        return mix(scale.midColor, scale.maxColor, clamp((value - mid) / (max - mid || 1)));
     }
-    return mix(scale.minColor, scale.maxColor, clamp((value - scale.min) / (scale.max - scale.min || 1)));
+    return mix(scale.minColor, scale.maxColor, clamp((value - min) / (max - min || 1)));
 }
 
 function mix(from: string, to: string, t: number): string {
     const a = hexToRgb(from);
     const b = hexToRgb(to);
-    const c = (i: number) => Math.round(a[i] + (b[i] - a[i]) * t);
+    if (!a || !b) return "";
+    const c = (i: number) => Math.max(0, Math.min(255, Math.round(a[i] + (b[i] - a[i]) * t)));
     return `#${[c(0), c(1), c(2)].map((n) => n.toString(16).padStart(2, "0")).join("")}`;
 }
 
-function hexToRgb(hex: string): [number, number, number] {
-    const h = String(hex || "").replace("#", "");
-    const full = h.length === 3 ? h.split("").map((x) => x + x).join("") : h;
-    const n = parseInt(full || "000000", 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
 function matches(rule: CfRule, cell: unknown): boolean {
-    const a = numericish(cell);
-    const b = numericish(rule.value);
+    let a = numericish(cell);
+    let b = numericish(rule.value);
+    // fall back to date comparison when both sides are dates
+    if ((isNaN(a) || isNaN(b)) && /[<>]/.test(rule.op || "")) {
+        const da = toDate(cell);
+        const db = toDate(rule.value);
+        if (da && db) { a = da.getTime(); b = db.getTime(); }
+    }
     switch (rule.op) {
         case ">": return a > b;
         case ">=": return a >= b;
@@ -129,16 +134,22 @@ function matches(rule: CfRule, cell: unknown): boolean {
         case "<=": return a <= b;
         case "==": return looseEq(cell, rule.value);
         case "!=": return !looseEq(cell, rule.value);
-        case "contains": return String(cell ?? "").toLowerCase().indexOf(String(rule.value ?? "").toLowerCase()) !== -1;
-        case "between": return a >= b && a <= numericish(rule.value2);
+        case "contains": {
+            const needle = String(rule.value ?? "");
+            if (needle === "") return false; // a rule with no `value` must not match every row
+            return String(cell ?? "").toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+        }
+        case "between": {
+            const b2 = numericish(rule.value2);
+            if (isNaN(a) || isNaN(b) || isNaN(b2)) return false;
+            return a >= Math.min(b, b2) && a <= Math.max(b, b2);
+        }
         default: return false;
     }
 }
 
 function numericish(v: unknown): number {
-    if (typeof v === "number") return v;
-    const n = parseFloat(String(v ?? "").replace(/[^0-9.\-eE]/g, ""));
-    return isNaN(n) ? NaN : n;
+    return parseNumeric(v);
 }
 
 function looseEq(a: unknown, b: unknown): boolean {

@@ -158,7 +158,7 @@ export class TemplateEditorDialog {
     private updateMarkers(template: string): void {
         const model = this.editor.getModel();
         if (!model) return;
-        const marks = lintTemplate(template, this.fieldNames, this.sampleRows[0] || {});
+        const marks = lintTemplate(template, this.fieldNames, this.sampleRows[0] || {}, COMPONENT_LIBRARY);
         const markers = marks.map((mk) => {
             const start = offsetToPosition(template, mk.offset);
             const end = offsetToPosition(template, mk.offset + Math.max(1, mk.length));

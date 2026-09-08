@@ -65,8 +65,8 @@ export const COMPONENT_LIBRARY: Record<string, string> = {
     // {{> comparison label=content actual=Actual target=Target}}
     comparison: `<div class="py-1"><div class="small">{{label}}</div>
   <div style="position:relative;height:14px;background:var(--hf-track,#e1dfdd);border-radius:3px">
-    <div style="position:absolute;inset:0;width:{{pct(actual,max(target,actual))}}%;background:var(--hf-accent,#118dff);border-radius:3px"></div>
-    <div style="position:absolute;top:-2px;bottom:-2px;left:{{pct(target,max(target,actual))}}%;width:2px;background:#000"></div>
+    <div style="position:absolute;inset:0;width:{{pct(actual,maxOf(target,actual))}}%;background:var(--hf-accent,#118dff);border-radius:3px"></div>
+    <div style="position:absolute;top:-2px;bottom:-2px;left:{{pct(target,maxOf(target,actual))}}%;width:2px;background:#000"></div>
   </div></div>`,
 
     // {{> calloutCard icon="info-circle" title="Note" text=content}}

@@ -1,4 +1,5 @@
 import { Helper } from "./templateEngine";
+import { parseNumeric, hexToRgb } from "./numeric";
 
 /**
  * Aggregation / sort / filter helpers so authors can build subtotals,
@@ -19,21 +20,26 @@ function asArray(v: unknown): unknown[] {
     return [];
 }
 
+function valueOf(item: unknown, field?: unknown): unknown {
+    return field ? (item as Row)?.[String(field)] : item;
+}
+
 function numOf(item: unknown, field?: unknown): number {
-    const raw = field ? (item as Row)?.[String(field)] : item;
-    const n = typeof raw === "number" ? raw : parseFloat(String(raw ?? "").replace(/[^0-9.\-eE]/g, ""));
+    const n = parseNumeric(valueOf(item, field));
     return isNaN(n) ? 0 : n;
 }
 
+/** Stable comparator: numeric when both sides are numeric, else string. */
 function compareBy(field: unknown, dir: string) {
     const sign = String(dir).toLowerCase() === "desc" ? -1 : 1;
     return (a: unknown, b: unknown): number => {
-        const av = field ? (a as Row)?.[String(field)] : a;
-        const bv = field ? (b as Row)?.[String(field)] : b;
-        const an = typeof av === "number" ? av : parseFloat(String(av));
-        const bn = typeof bv === "number" ? bv : parseFloat(String(bv));
-        if (!isNaN(an) && !isNaN(bn)) return (an - bn) * sign;
-        return String(av ?? "").localeCompare(String(bv ?? "")) * sign;
+        const av = valueOf(a, field);
+        const bv = valueOf(b, field);
+        const an = parseNumeric(av);
+        const bn = parseNumeric(bv);
+        const bothNum = !isNaN(an) && !isNaN(bn);
+        const r = bothNum ? an - bn : String(av ?? "").localeCompare(String(bv ?? ""), "en");
+        return r * sign;
     };
 }
 
@@ -53,6 +59,8 @@ export function buildCollectionHelpers(): Record<string, Helper> {
             return arr.length ? Math.max(...arr.map((it) => numOf(it, field))) : 0;
         },
         count: (list) => asArray(list).length,
+        maxOf: (...vals) => Math.max(...vals.map((v) => parseNumeric(v)).filter((n) => !isNaN(n))),
+        minOf: (...vals) => Math.min(...vals.map((v) => parseNumeric(v)).filter((n) => !isNaN(n))),
         pluck: (list, field) => asArray(list).map((it) => (it as Row)?.[String(field)]),
         first: (list, field) => {
             const it = asArray(list)[0];
@@ -76,8 +84,8 @@ export function buildCollectionHelpers(): Record<string, Helper> {
         bottom: (list, n, field) => asArray(list).slice().sort(compareBy(field, "asc")).slice(0, Math.max(0, Number(n) || 0)),
         rank: (list, field, item) => {
             const sorted = asArray(list).slice().sort(compareBy(field, "desc"));
-            const target = numOf(item, field);
-            const idx = sorted.findIndex((it) => numOf(it, field) === target);
+            const target = String(valueOf(item, field) ?? "");
+            const idx = sorted.findIndex((it) => String(valueOf(it, field) ?? "") === target);
             return idx === -1 ? sorted.length + 1 : idx + 1;
         },
         pctOfTotal: (value, list, field) => {
@@ -93,9 +101,9 @@ export function buildCollectionHelpers(): Record<string, Helper> {
             }
             return Array.from(groups, ([key, items]) => ({ key, items, count: items.length }));
         },
-        colorScale: (value, min, max, from, to) => interpolateColor(Number(value), Number(min), Number(max), String(from || "#ffffff"), String(to || "#118dff")),
+        colorScale: (value, min, max, from, to) => interpolateColor(parseNumeric(value), Number(min), Number(max), String(from || "#ffffff"), String(to || "#118dff")),
         relativeTime: (v) => relativeTime(v),
-        duration: (seconds) => formatDuration(Number(seconds)),
+        duration: (seconds) => formatDuration(parseNumeric(seconds)),
         split: (str, sep) => String(str ?? "").split(sep ? String(sep) : ",").map((s) => s.trim()).filter(Boolean),
         join: (list, sep) => asArray(list).join(sep === undefined ? ", " : String(sep)),
         initials: (name) =>
@@ -103,24 +111,18 @@ export function buildCollectionHelpers(): Record<string, Helper> {
                 .split(/\s+/)
                 .filter(Boolean)
                 .slice(0, 2)
-                .map((w) => w[0]?.toUpperCase() ?? "")
+                .map((w) => (Array.from(w)[0] || "").toUpperCase())
                 .join("")
     };
 }
 
 function interpolateColor(value: number, min: number, max: number, from: string, to: string): string {
-    const t = max === min ? 0 : Math.max(0, Math.min(1, (value - min) / (max - min)));
     const a = hexToRgb(from);
     const b = hexToRgb(to);
-    const mix = (i: number) => Math.round(a[i] + (b[i] - a[i]) * t);
+    if (isNaN(value) || isNaN(min) || isNaN(max) || !a || !b) return "";
+    const t = max === min ? 0 : Math.max(0, Math.min(1, (value - min) / (max - min)));
+    const mix = (i: number) => Math.max(0, Math.min(255, Math.round(a[i] + (b[i] - a[i]) * t)));
     return `#${[mix(0), mix(1), mix(2)].map((n) => n.toString(16).padStart(2, "0")).join("")}`;
-}
-
-function hexToRgb(hex: string): [number, number, number] {
-    const h = hex.replace("#", "");
-    const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
-    const n = parseInt(full || "000000", 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
 function relativeTime(v: unknown): string {
@@ -129,16 +131,21 @@ function relativeTime(v: unknown): string {
     if (isNaN(d.getTime())) return String(v);
     const diff = (d.getTime() - Date.now()) / 1000;
     const abs = Math.abs(diff);
-    const units: Array<[number, string]> = [
-        [60, "second"], [3600, "minute"], [86400, "hour"],
-        [604800, "day"], [2629800, "week"], [31557600, "month"]
+    // [upper bound in seconds (exclusive), unit name, seconds per unit]
+    const units: Array<[number, string, number]> = [
+        [60, "second", 1],
+        [3600, "minute", 60],
+        [86400, "hour", 3600],
+        [604800, "day", 86400],
+        [2629800, "week", 604800],
+        [31557600, "month", 2629800]
     ];
     let unit = "year";
     let scale = 31557600;
-    for (let i = 0; i < units.length; i++) {
-        if (abs < units[i][0]) {
-            unit = i === 0 ? "second" : units[i - 1][1];
-            scale = i === 0 ? 1 : units[i - 1][0];
+    for (const [bound, name, perUnit] of units) {
+        if (abs < bound) {
+            unit = name;
+            scale = perUnit;
             break;
         }
     }

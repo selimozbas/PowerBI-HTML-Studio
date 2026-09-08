@@ -61,4 +61,23 @@ describe("formatValue", () => {
     it("formats dates", () => {
         expect(formatValue(new Date(2024, 0, 5), "yyyy-MM-dd")).toBe("2024-01-05");
     });
+
+    it("integer patterns keep 0 decimals (H3)", () => {
+        expect(formatValue(1234.567, "#,##0")).toBe("1,235");
+        expect(formatValue(5.126, "0")).toBe("5");
+        expect(formatValue(1234.5, "#,##0.0")).toBe("1,234.5");
+    });
+
+    it("ISO date strings do not shift a day (H4)", () => {
+        expect(formatValue("2024-03-15", "yyyy-MM-dd")).toBe("2024-03-15");
+        expect(formatValue("2024-03-15", "dd/MM/yyyy")).toBe("15/03/2024");
+    });
+
+    it("a bare year number is not misread as a date", () => {
+        expect(formatValue(2024, "yyyy")).toBe("2024");
+    });
+
+    it("accounting negatives and non-numeric decimals", () => {
+        expect(formatValue("(1,234)", "#,##0")).toBe("-1,234");
+    });
 });

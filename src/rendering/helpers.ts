@@ -3,6 +3,7 @@ import { Helper } from "./templateEngine";
 import { formatValue } from "./format";
 import { sparkline, bar, ring, rating } from "./charts";
 import { buildCollectionHelpers } from "./collectionHelpers";
+import { parseNumeric, toDate } from "./numeric";
 
 /**
  * The helper functions exposed to templates as {{ name(args) }}.
@@ -44,8 +45,9 @@ export function buildHelpers(locale = "en-US"): Record<string, Helper> {
 }
 
 function num(v: unknown, fallback: number): number {
+    if (v === undefined || v === null || v === "") return fallback;
     const n = Number(v);
-    return isNaN(n) || v === undefined || v === "" ? fallback : n;
+    return isNaN(n) ? fallback : n;
 }
 
 /** Inline SVG QR code, sized to `px`, no external dependency at render time. */
@@ -63,16 +65,17 @@ function qrSvg(text: unknown, px: number): string {
     }
 }
 
-function toNumber(v: unknown): number | null {
-    if (v === null || v === undefined || v === "") return null;
-    const n = typeof v === "number" ? v : parseFloat(String(v).replace(/[^0-9.\-eE]/g, ""));
-    return isNaN(n) ? null : n;
+/** Clamp a user-supplied decimals arg to a valid Intl fraction-digit count. */
+function fracDigits(decimals: unknown, fallback: number | undefined): number | undefined {
+    if (decimals === undefined || decimals === "" || decimals === null) return fallback;
+    const d = Math.trunc(Number(decimals));
+    return isNaN(d) ? fallback : Math.max(0, Math.min(20, d));
 }
 
 function localeNumber(v: unknown, decimals: unknown, locale: string): string {
-    const n = toNumber(v);
-    if (n === null) return "";
-    const d = decimals === undefined || decimals === "" ? undefined : Number(decimals);
+    const n = parseNumeric(v);
+    if (isNaN(n)) return "";
+    const d = fracDigits(decimals, undefined);
     return new Intl.NumberFormat(locale, {
         minimumFractionDigits: d,
         maximumFractionDigits: d ?? 3
@@ -80,9 +83,9 @@ function localeNumber(v: unknown, decimals: unknown, locale: string): string {
 }
 
 function localePercent(v: unknown, decimals: unknown, locale: string): string {
-    const n = toNumber(v);
-    if (n === null) return "";
-    const d = decimals === undefined || decimals === "" ? 0 : Number(decimals);
+    const n = parseNumeric(v);
+    if (isNaN(n)) return "";
+    const d = fracDigits(decimals, 0) ?? 0;
     return new Intl.NumberFormat(locale, {
         style: "percent",
         minimumFractionDigits: d,
@@ -91,8 +94,8 @@ function localePercent(v: unknown, decimals: unknown, locale: string): string {
 }
 
 function localeCurrency(v: unknown, code: unknown, locale: string): string {
-    const n = toNumber(v);
-    if (n === null) return "";
+    const n = parseNumeric(v);
+    if (isNaN(n)) return "";
     try {
         return new Intl.NumberFormat(locale, {
             style: "currency",
@@ -105,8 +108,8 @@ function localeCurrency(v: unknown, code: unknown, locale: string): string {
 
 function localeDate(v: unknown, style: unknown, locale: string): string {
     if (v === null || v === undefined || v === "") return "";
-    const d = v instanceof Date ? v : new Date(String(v));
-    if (isNaN(d.getTime())) return String(v);
+    const d = toDate(v) || (typeof v === "string" && !isNaN(Date.parse(v)) ? new Date(v) : null);
+    if (!d) return String(v);
     const s = String(style || "medium");
     const key = s === "time" ? "timeStyle" : "dateStyle";
     const val = s === "short" || s === "long" || s === "full" ? s : s === "time" ? "short" : "medium";

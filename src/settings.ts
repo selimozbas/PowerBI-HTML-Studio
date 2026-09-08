@@ -9,11 +9,9 @@ import Model = formattingSettings.Model;
  * page / template gallery offers richer starting points.
  */
 export const DEFAULT_BODY_TEMPLATE = [
-    "<div class=\"hf-card\">",
-    "  {{#rows}}",
+    "{{#each rows}}",
     "  <div class=\"hf-row\">{{{content}}}</div>",
-    "  {{/rows}}",
-    "</div>"
+    "{{/each}}"
 ].join("\n");
 
 class ContentCard extends Card {
@@ -134,7 +132,10 @@ class StylingCard extends Card {
     align = new formattingSettings.AlignmentGroup({
         name: "align",
         displayName: "Alignment",
-        mode: powerbi.visuals.AlignmentGroupMode.Horizonal,
+        // powerbi.visuals.AlignmentGroupMode.Horizonal — inlined as its string value
+        // so this file doesn't depend on the ambient `powerbi` global at runtime
+        // (the API's own spelling is "Horizonal"; do not "correct" it).
+        mode: "horizontalAlignment" as unknown as powerbi.visuals.AlignmentGroupMode,
         value: "left"
     });
 

@@ -8,16 +8,23 @@
  * exotic should be produced in DAX and passed through as text.
  */
 
+import { parseNumeric, toDate } from "./numeric";
+
+const DATE_TOKENS = /y{2,4}|MM|dd|HH|mm|ss/;
+
 export function formatValue(value: unknown, pattern: string, locale = "en-US"): string {
     if (value == null || value === "") {
         return "";
     }
 
-    if (pattern && /[yMdHms]/.test(pattern) && (value instanceof Date || !isNaN(Date.parse(String(value))))) {
-        return formatDate(value instanceof Date ? value : new Date(String(value)), pattern);
+    if (pattern && DATE_TOKENS.test(pattern)) {
+        const d = toDate(value);
+        // pattern is a date pattern: format the date, or pass the value through
+        // rather than feeding a date pattern into the number formatter.
+        return d ? formatDate(d, pattern) : String(value);
     }
 
-    const num = typeof value === "number" ? value : parseFloat(String(value).replace(/[^0-9.\-eE]/g, ""));
+    const num = parseNumeric(value);
     if (isNaN(num)) {
         return String(value);
     }
@@ -31,16 +38,20 @@ function formatNumber(num: number, pattern: string, locale: string): string {
     const useGrouping = pattern.indexOf(",") !== -1;
 
     const core = pattern.replace(/[^0#.]/g, "");
+    const hasFractionSpec = core.indexOf(".") !== -1;
     const decPart = core.split(".")[1] || "";
     const minFractionDigits = (decPart.match(/0/g) || []).length;
-    const maxFractionDigits = Math.max(minFractionDigits, decPart.length);
+    // no "." in the pattern => explicit integer format; keep 0 decimals.
+    const maxFractionDigits = hasFractionSpec
+        ? Math.max(minFractionDigits, decPart.length)
+        : minFractionDigits;
 
-    let scaled = isPercent ? num * 100 : num;
+    const scaled = isPercent ? num * 100 : num;
 
     const formatted = new Intl.NumberFormat(locale, {
         useGrouping,
         minimumFractionDigits: minFractionDigits,
-        maximumFractionDigits: maxFractionDigits || (isPercent ? 0 : 2)
+        maximumFractionDigits: maxFractionDigits
     }).format(scaled);
 
     return `${prefix}${formatted}${isPercent ? "%" : ""}`;
