@@ -44,6 +44,6 @@ export function renderDebugPanel(host: HTMLElement, info: DebugInfo, t: Translat
     }
     mountTrustedHtml(
         host,
-        `<div class="hf-debug-title">${escapeHtml(t("Debug_Title", "HTML Forge diagnostics"))}</div>${rows.join("")}`
+        `<div class="hf-debug-title">${escapeHtml(t("Debug_Title", "HTML Studio diagnostics"))}</div>${rows.join("")}`
     );
 }

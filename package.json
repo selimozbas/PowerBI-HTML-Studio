@@ -1,12 +1,12 @@
 {
-  "name": "powerbi-visuals-html-forge",
+  "name": "powerbi-visuals-html-studio",
   "version": "0.1.0",
-  "description": "Render column or measure values as HTML/SVG on the Power BI canvas, with a real templating engine, conditional formatting, interactive components and inline mini-charts.",
+  "description": "Render HTML/SVG on the Power BI canvas with a templating engine, component library, interactive charts, Bootstrap 5 and a built-in Monaco editor.",
   "license": "MIT",
   "author": "Selim Ozbas <selimozbas@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dm-p/powerbi-visuals-html-content"
+    "url": "https://github.com/selimozbas/powerbi-visuals-html-studio"
   },
   "scripts": {
     "embed-bootstrap": "node scripts/embed-bootstrap.mjs",

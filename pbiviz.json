@@ -1,13 +1,13 @@
 {
   "visual": {
-    "name": "htmlForge",
-    "displayName": "HTML Forge",
-    "guid": "htmlForge8f5def24026487ed5eb77af49c32fd1e",
+    "name": "htmlStudio",
+    "displayName": "HTML Studio",
+    "guid": "htmlStudio697a2883e901e02181c46eec18a82703",
     "visualClassName": "Visual",
     "version": "0.1.0.0",
-    "description": "Render column or measure values as HTML and SVG on the report canvas. Includes a templating engine with named fields, rule-based conditional formatting, sandbox-safe interactive components (tabs, accordion) and inline mini-charts.",
-    "supportUrl": "https://github.com/dm-p/powerbi-visuals-html-content/issues",
-    "gitHubUrl": "https://github.com/dm-p/powerbi-visuals-html-content"
+    "description": "Render HTML and SVG on the report canvas with a real templating engine, named data fields, a component library, interactive uPlot charts, Bootstrap 5 and a built-in Monaco editor. Rule-based conditional formatting, cross-filtering, an HTML slicer mode and viewer write-back, all without DAX string building.",
+    "supportUrl": "https://github.com/selimozbas/powerbi-visuals-html-studio/issues",
+    "gitHubUrl": "https://github.com/selimozbas/powerbi-visuals-html-studio"
   },
   "apiVersion": "5.11.0",
   "author": {

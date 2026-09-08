@@ -4,7 +4,7 @@ type SubSelectionStyles = powerbi.visuals.SubSelectionStyles;
 type VisualSubSelectionShortcuts = powerbi.visuals.VisualSubSelectionShortcuts;
 
 /**
- * On-object formatting for HTML Forge.
+ * On-object formatting for HTML Studio.
  *
  * The content region is one sub-selectable object bound to the "styling"
  * formatting object; authors can additionally tag elements in their HTML
