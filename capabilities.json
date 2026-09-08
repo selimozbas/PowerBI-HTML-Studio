@@ -108,7 +108,22 @@
               { "value": "visible", "displayName": "Visible" }
             ]
           }
+        },
+        "direction": {
+          "type": {
+            "enumeration": [
+              { "value": "auto", "displayName": "Auto (from locale)" },
+              { "value": "ltr", "displayName": "Left to right" },
+              { "value": "rtl", "displayName": "Right to left" }
+            ]
+          }
         }
+      }
+    },
+    "fonts": {
+      "properties": {
+        "googleFamilies": { "type": { "text": true } },
+        "fontFaceCss": { "type": { "text": true } }
       }
     },
     "stylesheet": {
@@ -157,6 +172,11 @@
     "accessibility": {
       "properties": {
         "ariaLabel": { "type": { "text": true } }
+      }
+    },
+    "performance": {
+      "properties": {
+        "maxRows": { "type": { "numeric": true } }
       }
     },
     "debug": {

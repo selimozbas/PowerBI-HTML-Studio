@@ -16,6 +16,7 @@ import { transform, ForgeModel } from "./dataView/transform";
 import { renderContent } from "./rendering/htmlRenderer";
 import { sanitizeToFragment } from "./rendering/sanitize";
 import { buildThemeVars } from "./theme/themeVars";
+import { buildFontCss } from "./theme/fonts";
 import { activateComponents, ComponentState } from "./rendering/components";
 import { SelectionBinder, SelectionOptions } from "./interactivity/selection";
 import { TooltipBinder } from "./interactivity/tooltip";
@@ -49,6 +50,7 @@ export class Visual implements IVisual {
     private detachTooltip: (() => void) | null = null;
     private componentState: ComponentState = {};
     private lastModel: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, hasData: false };
+    private lastRenderKey = "";
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -125,6 +127,17 @@ export class Visual implements IVisual {
             })
             : "";
 
+        // Style-only / resize updates: refresh the cheap bits and bail out
+        // before re-running the template engine + sanitiser.
+        this.styleEl.textContent = this.composeCss(themeVars);
+        this.applyWrapperStyles();
+
+        const renderKey = this.computeRenderKey(model);
+        if (renderKey === this.lastRenderKey && this.contentEl.childNodes.length > 0) {
+            return;
+        }
+        this.lastRenderKey = renderKey;
+
         const rendered = renderContent({
             model,
             contentSource: this.enumValue(s.content.contentSource.value, "value") as "value" | "template",
@@ -134,6 +147,7 @@ export class Visual implements IVisual {
             rowTemplate: s.content.rowTemplate.value || "",
             separator: this.decodeSeparator(s.content.separator.value),
             noDataMessage: s.content.noDataMessage.value,
+            rowLimit: s.performance.maxRows.value,
             conditionalFormatting: {
                 enabled: s.conditionalFormatting.enabled.value,
                 rulesRaw: s.conditionalFormatting.rules.value
@@ -149,9 +163,6 @@ export class Visual implements IVisual {
             extraTags: splitList(s.sanitization.extraAllowedTags.value),
             extraAttrs: splitList(s.sanitization.extraAllowedAttrs.value)
         });
-
-        this.styleEl.textContent = this.composeCss(themeVars, s.stylesheet.css.value);
-        this.applyWrapperStyles();
 
         this.teardownDynamic();
         mountFragment(this.contentEl, sanitized.fragment);
@@ -229,8 +240,10 @@ export class Visual implements IVisual {
         });
     }
 
-    private composeCss(themeVars: string, userCss: string): string {
-        return `.hf-visual{${themeVars}}\n${userCss || ""}`;
+    private composeCss(themeVars: string): string {
+        const s = this.settings;
+        const fontCss = buildFontCss(s.fonts.googleFamilies.value, s.fonts.fontFaceCss.value);
+        return `${fontCss}\n.hf-visual{${themeVars}}\n${s.stylesheet.css.value || ""}`;
     }
 
     private applyWrapperStyles(): void {
@@ -243,7 +256,42 @@ export class Visual implements IVisual {
         c.padding = `${st.padding.value}px`;
         c.overflow = this.enumValue(st.overflow.value, "auto");
         c.background = st.background.value.value || "";
+        this.contentEl.dir = this.resolveDirection(this.enumValue(st.direction.value, "auto"));
         this.root.style.height = "100%";
+    }
+
+    private resolveDirection(setting: string): string {
+        if (setting === "ltr" || setting === "rtl") return setting;
+        const loc = (this.host.locale || "en").toLowerCase().split("-")[0];
+        return ["ar", "he", "fa", "ur", "ps", "dv", "syr", "ckb", "yi"].indexOf(loc) !== -1 ? "rtl" : "ltr";
+    }
+
+    private computeRenderKey(model: ForgeModel): string {
+        const s = this.settings;
+        const fp = {
+            cs: s.content.contentSource.value,
+            rm: s.content.renderMode.value,
+            md: s.content.renderMarkdown.value,
+            bt: s.content.bodyTemplate.value,
+            rt: s.content.rowTemplate.value,
+            sep: s.content.separator.value,
+            ndm: s.content.noDataMessage.value,
+            uas: s.content.unsafeAllowScripts.value,
+            maxRows: s.performance.maxRows.value,
+            dbg: s.debug.showPanel.value,
+            hl: s.hyperlinks.enabled.value,
+            cmp: [s.components.enabled.value, s.components.persistState.value],
+            cf: [s.conditionalFormatting.enabled.value, s.conditionalFormatting.rules.value],
+            san: [
+                s.sanitization.enabled.value,
+                s.sanitization.allowSvg.value,
+                s.sanitization.allowStyleTag.value,
+                s.sanitization.extraAllowedTags.value,
+                s.sanitization.extraAllowedAttrs.value
+            ]
+        };
+        const rows = model.rows.map((r) => [r.content, r.fields]);
+        return JSON.stringify({ fp, rows, fields: model.fieldNames });
     }
 
     private decodeSeparator(raw: string): string {

@@ -145,9 +145,40 @@ class StylingCard extends Card {
         value: { value: "auto", displayName: "Scroll" }
     });
 
+    direction = new formattingSettings.ItemDropdown({
+        name: "direction",
+        displayName: "Text direction",
+        items: [
+            { value: "auto", displayName: "Auto (from locale)" },
+            { value: "ltr", displayName: "Left to right" },
+            { value: "rtl", displayName: "Right to left" }
+        ],
+        value: { value: "auto", displayName: "Auto (from locale)" }
+    });
+
     name = "styling";
     displayName = "Styling";
-    slices = [this.font, this.fontColor, this.background, this.align, this.padding, this.overflow];
+    slices = [this.font, this.fontColor, this.background, this.align, this.padding, this.overflow, this.direction];
+}
+
+class FontsCard extends Card {
+    googleFamilies = new formattingSettings.TextInput({
+        name: "googleFamilies",
+        displayName: "Google Fonts families",
+        placeholder: "Roboto, Open Sans:400;700",
+        value: ""
+    });
+
+    fontFaceCss = new formattingSettings.TextArea({
+        name: "fontFaceCss",
+        displayName: "@font-face CSS",
+        placeholder: "@font-face { font-family: 'My Font'; src: url(data:font/woff2;base64,...) }",
+        value: ""
+    });
+
+    name = "fonts";
+    displayName = "Fonts";
+    slices = [this.googleFamilies, this.fontFaceCss];
 }
 
 class StylesheetCard extends Card {
@@ -300,6 +331,19 @@ class AccessibilityCard extends Card {
     slices = [this.ariaLabel];
 }
 
+class PerformanceCard extends Card {
+    maxRows = new formattingSettings.NumUpDown({
+        name: "maxRows",
+        displayName: "Max rows rendered (0 = all)",
+        value: 0,
+        options: { minValue: { value: 0, type: 0 }, maxValue: { value: 30000, type: 1 } }
+    });
+
+    name = "performance";
+    displayName = "Performance";
+    slices = [this.maxRows];
+}
+
 class DebugCard extends Card {
     showPanel = new formattingSettings.ToggleSwitch({
         name: "showPanel",
@@ -315,6 +359,7 @@ class DebugCard extends Card {
 export class VisualFormattingSettingsModel extends Model {
     content = new ContentCard();
     styling = new StylingCard();
+    fonts = new FontsCard();
     stylesheet = new StylesheetCard();
     conditionalFormatting = new ConditionalFormattingCard();
     components = new ComponentsCard();
@@ -323,11 +368,13 @@ export class VisualFormattingSettingsModel extends Model {
     sanitization = new SanitizationCard();
     theme = new ThemeCard();
     accessibility = new AccessibilityCard();
+    performance = new PerformanceCard();
     debug = new DebugCard();
 
     cards = [
         this.content,
         this.styling,
+        this.fonts,
         this.stylesheet,
         this.conditionalFormatting,
         this.components,
@@ -336,6 +383,7 @@ export class VisualFormattingSettingsModel extends Model {
         this.sanitization,
         this.theme,
         this.accessibility,
+        this.performance,
         this.debug
     ];
 }

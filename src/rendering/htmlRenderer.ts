@@ -13,6 +13,7 @@ export interface RenderInput {
     rowTemplate: string;
     separator: string;
     noDataMessage: string;
+    rowLimit: number;
     conditionalFormatting: { enabled: boolean; rulesRaw: string };
     locale: string;
 }
@@ -29,6 +30,13 @@ export function renderContent(input: RenderInput): RenderOutput {
     if (!model.hasData) {
         return { html: emptyMessage(input.noDataMessage), errors: [], rowMapped: false };
     }
+
+    const limit = input.rowLimit > 0 ? input.rowLimit : model.rows.length;
+    const rows = model.rows.length > limit ? model.rows.slice(0, limit) : model.rows;
+    const truncated = model.rows.length - rows.length;
+    const moreNote = truncated > 0
+        ? `<div class="hf-more">+ ${truncated} more row${truncated === 1 ? "" : "s"} not shown</div>`
+        : "";
 
     const helpers = buildHelpers(input.locale);
     const md = (s: string): string => (input.markdown ? markdownToHtml(s) : s);
@@ -52,11 +60,11 @@ export function renderContent(input: RenderInput): RenderOutput {
 
     if (input.contentSource === "value") {
         if (input.renderMode === "row") {
-            const html = model.rows.map((r) => wrapRow(r, rowView(r), md(r.content))).join("");
+            const html = rows.map((r) => wrapRow(r, rowView(r), md(r.content))).join("") + moreNote;
             return { html, errors, rowMapped: true };
         }
         const sep = input.separator || "";
-        const html = md(model.rows.map((r) => r.content).join(sep));
+        const html = md(rows.map((r) => r.content).join(sep));
         return { html, errors, rowMapped: false };
     }
 
@@ -64,23 +72,24 @@ export function renderContent(input: RenderInput): RenderOutput {
     if (input.renderMode === "row") {
         const tpl = input.rowTemplate || "{{{content}}}";
         let html = "";
-        for (const r of model.rows) {
+        for (const r of rows) {
             const res = renderTemplate(tpl, rowView(r), helpers);
             errors.push(...res.errors);
             html += wrapRow(r, rowView(r), md(res.html));
         }
-        return { html, errors, rowMapped: true };
+        return { html: html + moreNote, errors, rowMapped: true };
     }
 
     const body = input.bodyTemplate || "{{#each rows}}{{{content}}}{{/each}}";
     const view = {
-        rows: model.rows.map(rowView),
+        rows: rows.map(rowView),
         fieldNames: model.fieldNames,
-        rowCount: model.rows.length
+        rowCount: rows.length,
+        totalRowCount: model.rows.length
     };
     const res = renderTemplate(body, view, helpers);
     errors.push(...res.errors);
-    return { html: md(res.html), errors, rowMapped: false };
+    return { html: md(res.html) + moreNote, errors, rowMapped: false };
 }
 
 function wrapRow(row: ForgeRow, view: Record<string, unknown>, inner: string): string {

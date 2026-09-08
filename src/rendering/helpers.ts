@@ -24,6 +24,10 @@ export function buildHelpers(locale = "en-US"): Record<string, Helper> {
             return Math.round(Number(v) * f) / f;
         },
         json: (v) => JSON.stringify(v),
+        number: (v, decimals) => localeNumber(v, decimals, locale),
+        percent: (v, decimals) => localePercent(v, decimals, locale),
+        currency: (v, code) => localeCurrency(v, code, locale),
+        date: (v, style) => localeDate(v, style, locale),
         selectAttr: (field, value) => {
             const spec = value === undefined ? String(field ?? "") : `${String(field)}:${String(value ?? "")}`;
             return `data-hf-select="${spec.replace(/"/g, "&quot;")}"`;
@@ -38,4 +42,55 @@ export function buildHelpers(locale = "en-US"): Record<string, Helper> {
 function num(v: unknown, fallback: number): number {
     const n = Number(v);
     return isNaN(n) || v === undefined || v === "" ? fallback : n;
+}
+
+function toNumber(v: unknown): number | null {
+    if (v === null || v === undefined || v === "") return null;
+    const n = typeof v === "number" ? v : parseFloat(String(v).replace(/[^0-9.\-eE]/g, ""));
+    return isNaN(n) ? null : n;
+}
+
+function localeNumber(v: unknown, decimals: unknown, locale: string): string {
+    const n = toNumber(v);
+    if (n === null) return "";
+    const d = decimals === undefined || decimals === "" ? undefined : Number(decimals);
+    return new Intl.NumberFormat(locale, {
+        minimumFractionDigits: d,
+        maximumFractionDigits: d ?? 3
+    }).format(n);
+}
+
+function localePercent(v: unknown, decimals: unknown, locale: string): string {
+    const n = toNumber(v);
+    if (n === null) return "";
+    const d = decimals === undefined || decimals === "" ? 0 : Number(decimals);
+    return new Intl.NumberFormat(locale, {
+        style: "percent",
+        minimumFractionDigits: d,
+        maximumFractionDigits: d
+    }).format(n);
+}
+
+function localeCurrency(v: unknown, code: unknown, locale: string): string {
+    const n = toNumber(v);
+    if (n === null) return "";
+    try {
+        return new Intl.NumberFormat(locale, {
+            style: "currency",
+            currency: String(code || "USD")
+        }).format(n);
+    } catch {
+        return localeNumber(v, undefined, locale);
+    }
+}
+
+function localeDate(v: unknown, style: unknown, locale: string): string {
+    if (v === null || v === undefined || v === "") return "";
+    const d = v instanceof Date ? v : new Date(String(v));
+    if (isNaN(d.getTime())) return String(v);
+    const s = String(style || "medium");
+    const key = s === "time" ? "timeStyle" : "dateStyle";
+    const val = s === "short" || s === "long" || s === "full" ? s : s === "time" ? "short" : "medium";
+    const opts = { [key]: val } as unknown as Intl.DateTimeFormatOptions;
+    return new Intl.DateTimeFormat(locale, opts).format(d);
 }

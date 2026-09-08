@@ -3,7 +3,8 @@ import type * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
 export const TEMPLATE_LANGUAGE_ID = "hf-template";
 
 export const HELPER_NAMES = [
-    "format", "upper", "lower", "trim", "default",
+    "format", "number", "percent", "currency", "date",
+    "upper", "lower", "trim", "default",
     "add", "sub", "mul", "div", "pct", "round", "json",
     "selectAttr", "sparkline", "bar", "ring", "rating"
 ];

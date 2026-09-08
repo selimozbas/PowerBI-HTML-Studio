@@ -19,6 +19,9 @@ a lot more built in.
 | Interactivity | Cross-filter by row **or by field value** (`data-hf-select="Region:North"`), multi-select, dimming, right-click context menu, `http(s)` links via `launchUrl` |
 | Interactivity | Default Power BI **tooltips** for measures in the Tooltips field well |
 | Theming | Active report theme exposed as CSS variables (`--hf-accent`, `--hf-foreground`, …) |
+| Theming | **Fonts** card — Google Fonts families (`@import`, WebAccess-gated) or self-hosted `@font-face` (data-URI) |
+| i18n | **Text direction** auto (from locale) / LTR / RTL; locale-aware `number` / `percent` / `currency` / `date` helpers |
+| Perf | Render **memoisation** (style/resize updates skip the template engine) and an optional **max rows** cap |
 | Security | **DOMPurify** sanitisation with a configurable allow-list; inline `<script>` only behind an explicit unsafe toggle |
 | DX | **Advanced editor** (modal dialog): Monaco with `{{ }}` syntax highlighting, field/helper autocomplete, a starter-template gallery and a live preview |
 | DX | In-visual **diagnostics panel**: template errors, sanitiser removals, available field names |
@@ -26,8 +29,8 @@ a lot more built in.
 Open the editor from the **✎ Template** button shown on the visual while the
 report is in edit mode; OK writes the template back through `persistProperties`.
 
-Planned next: RTL & locale number helpers, `@font-face` embedding, DOM
-virtualization for very large tables, GitHub Actions CI.
+Planned next: true windowed virtualization for very large row sets,
+on-canvas sub-selection / on-object formatting.
 
 ### Authoring hooks (data- attributes)
 
