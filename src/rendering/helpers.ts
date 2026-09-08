@@ -111,8 +111,8 @@ function localeDate(v: unknown, style: unknown, locale: string): string {
     const d = toDate(v) || (typeof v === "string" && !isNaN(Date.parse(v)) ? new Date(v) : null);
     if (!d) return String(v);
     const s = String(style || "medium");
-    const key = s === "time" ? "timeStyle" : "dateStyle";
     const val = s === "short" || s === "long" || s === "full" ? s : s === "time" ? "short" : "medium";
-    const opts = { [key]: val } as unknown as Intl.DateTimeFormatOptions;
+    const opts: Intl.DateTimeFormatOptions =
+        s === "time" ? { timeStyle: val } : { dateStyle: val };
     return new Intl.DateTimeFormat(locale, opts).format(d);
 }

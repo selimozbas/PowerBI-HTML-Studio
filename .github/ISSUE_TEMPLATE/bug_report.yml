@@ -1,0 +1,38 @@
+name: Bug report
+description: Something renders wrong or a feature misbehaves
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw vs. what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: >
+        Minimal template / settings, the field wells used, and a small sample of
+        the data (shape, not real values). A .pbix helps if you can share one.
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Visual version
+      description: pbiviz.json → version (e.g. 0.1.1.0)
+    validations:
+      required: true
+  - type: dropdown
+    id: host
+    attributes:
+      label: Host
+      options:
+        - Power BI Desktop
+        - Power BI Service
+        - Both
+    validations:
+      required: true

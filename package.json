@@ -1,8 +1,9 @@
 {
   "name": "powerbi-visuals-html-studio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Render HTML/SVG on the Power BI canvas with a templating engine, component library, interactive charts, Bootstrap 5 and a built-in Monaco editor.",
   "license": "MIT",
+  "private": true,
   "author": "Selim Ozbas <selimozbas@gmail.com>",
   "repository": {
     "type": "git",
@@ -28,7 +29,7 @@
     "dompurify": "^3.1.7",
     "marked": "^18.0.12",
     "monaco-editor": "^0.52.2",
-    "powerbi-visuals-api": "~5.11.1",
+    "powerbi-visuals-api": "~5.11.0",
     "qrcode-generator": "^1.5.2",
     "uplot": "^1.6.32"
   },
@@ -39,10 +40,8 @@
     "eslint": "^9.12.0",
     "eslint-plugin-powerbi-visuals": "^1.1.1",
     "powerbi-visuals-tools": "^7.2.1",
-    "powerbi-visuals-utils-dataviewutils": "^7.0.0",
     "powerbi-visuals-utils-formattingmodel": "^7.1.0",
     "powerbi-visuals-utils-onobjectutils": "^6.0.3",
-    "powerbi-visuals-utils-tooltiputils": "^7.1.0",
     "typescript": "^5.6.2",
     "vitest": "^2.1.2"
   }

@@ -6,3 +6,4 @@ dist/
 .vscode/
 coverage/
 webpack.statistics.*.html
+.DS_Store

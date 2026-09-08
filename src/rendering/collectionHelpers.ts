@@ -132,7 +132,7 @@ function relativeTime(v: unknown): string {
     const diff = (d.getTime() - Date.now()) / 1000;
     const abs = Math.abs(diff);
     // [upper bound in seconds (exclusive), unit name, seconds per unit]
-    const units: Array<[number, string, number]> = [
+    const units: Array<[number, Intl.RelativeTimeFormatUnit, number]> = [
         [60, "second", 1],
         [3600, "minute", 60],
         [86400, "hour", 3600],
@@ -140,7 +140,7 @@ function relativeTime(v: unknown): string {
         [2629800, "week", 604800],
         [31557600, "month", 2629800]
     ];
-    let unit = "year";
+    let unit: Intl.RelativeTimeFormatUnit = "year";
     let scale = 31557600;
     for (const [bound, name, perUnit] of units) {
         if (abs < bound) {
@@ -150,9 +150,8 @@ function relativeTime(v: unknown): string {
         }
     }
     const n = Math.round(diff / scale);
-    const RTF = (Intl as unknown as {
-        RelativeTimeFormat?: new (l?: string, o?: { numeric?: string }) => { format: (n: number, u: string) => string };
-    }).RelativeTimeFormat;
+    // feature-detect: older embedded hosts may not ship Intl.RelativeTimeFormat
+    const RTF = typeof Intl.RelativeTimeFormat === "function" ? Intl.RelativeTimeFormat : null;
     if (RTF) {
         try {
             return new RTF(undefined, { numeric: "auto" }).format(n, unit);

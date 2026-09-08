@@ -24,7 +24,7 @@ attributes**.
 | `data-hf-acc="id"` | button | an accordion header (toggles) | below |
 | `data-hf-acc-panel="id"` | element | the accordion body for `data-hf-acc="id"` | below |
 | `data-hf-object="content"` | any element | marks a region **sub-selectable** for on-object formatting in format mode (`data-hf-object-label="…"` sets its label) | [styling](styling.md) |
-| `data-bs-toggle`, `data-bs-target`, `data-bs-dismiss`, `data-bs-ride`, `data-bs-parent`, `data-bs-placement`, `data-bs-content`, … | per Bootstrap docs | Bootstrap 5 component behaviour (collapse, tab, dropdown, tooltip, popover, carousel, toast, offcanvas, scrollspy) | [styling](styling.md) |
+| `data-bs-toggle`, `data-bs-target`, `data-bs-dismiss`, `data-bs-ride`, `data-bs-slide`, `data-bs-slide-to`, `data-bs-parent`, `data-bs-config`, `data-bs-placement`, `data-bs-trigger`, `data-bs-content`, `data-bs-interval`, `data-bs-theme`, `data-bs-spy` | per Bootstrap docs | Bootstrap 5 component behaviour (collapse, tab, dropdown, tooltip, popover, carousel, toast, offcanvas, scrollspy). This is the full allow-listed set; other `data-bs-*` attributes are stripped. | [styling](styling.md) |
 
 ## Built-in tabs & accordion
 

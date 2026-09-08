@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Node.js 20+ (developed on 26)
+- Node.js 22+ (see `.nvmrc`; CI runs on 22)
 - `npm install` — this also runs `scripts/embed-bootstrap.mjs` via the `prepare`
   script, generating `src/framework/bootstrapCss.ts` (git-ignored)
 - For `pbiviz start`, install the developer certificate once:
@@ -92,10 +92,11 @@ scripts/embed-bootstrap.mjs       Bootstrap CSS -> src/framework/bootstrapCss.ts
 
 ## CI
 
-`.github/workflows/build.yml` runs on push / PR: `npm ci` → `lint` →
-`typecheck` → `test` → `pbiviz package`, and uploads the `.pbiviz` artifact.
-A fresh `npm ci` triggers `prepare`, so the generated Bootstrap CSS is produced
-in CI too.
+`.github/workflows/build.yml` runs on push, PR and `v*` tags: `npm ci` →
+`lint` → `typecheck` → `test` → `npm run package` (so `postpackage` gives the
+friendly artifact name), and uploads the `.pbiviz` (30-day retention). A fresh
+`npm ci` triggers `prepare`, so the generated Bootstrap CSS is produced in CI
+too.
 
 ## Releasing
 
@@ -104,7 +105,9 @@ in CI too.
 2. `npm run package` — `pbiviz` emits `dist/htmlStudio<guid>.x.y.z.0.pbiviz`
    (the GUID-based name it always uses); the `postpackage` script then copies
    it to the friendlier `dist/html-studio-x.y.z.pbiviz`.
-3. `gh release create vX.Y.Z dist/html-studio-X.Y.Z.pbiviz --notes-file CHANGELOG.md`.
+3. `git tag vX.Y.Z && git push --tags` (CI re-verifies the tagged tree).
+4. `gh release create vX.Y.Z dist/html-studio-X.Y.Z.pbiviz --notes "…"` (notes
+   from the new `CHANGELOG.md` section).
 
 ## Tests
 

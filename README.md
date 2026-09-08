@@ -53,7 +53,7 @@ No string concatenation, no `FORMAT()` gymnastics, no CDN.
 ### 📝 A real templating language
 
 `{{Field}}` interpolation, `{{#if a > b}}` / `{{#each rows}}` / `{{#unless}}`
-blocks, and **35+ helpers** — `format`, `number`, `percent`, `currency`, `date`
+blocks, and **46 helpers** — `format`, `number`, `percent`, `currency`, `date`
 (locale-aware), plus `sum` / `avg` / `top` / `where` / `sortBy` / `rank` /
 `pctOfTotal` / `groupBy` so you can build **subtotals, top-N lists,
 leaderboards and grouped sections without DAX**. It's an AST interpreter — no
@@ -182,6 +182,11 @@ npm run package    # dist/*.pbiviz
 
 See [docs/development.md](docs/development.md) for the project layout, the
 two-`tsconfig` setup, and the release flow.
+
+## Contributing & security
+
+[CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) (report
+vulnerabilities privately) · [PRIVACY.md](PRIVACY.md).
 
 ## License
 

@@ -234,8 +234,7 @@
     "persistedState": {
       "properties": {
         "componentState": { "type": { "text": true } },
-        "formState": { "type": { "text": true } },
-        "editorContent": { "type": { "text": true } }
+        "formState": { "type": { "text": true } }
       }
     }
   },

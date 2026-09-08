@@ -3,7 +3,7 @@
     "allowJs": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2019",
+    "target": "es2021",
     "module": "es2015",
     "moduleResolution": "node",
     "sourceMap": true,
@@ -14,7 +14,7 @@
     "strictPropertyInitialization": false,
     "noImplicitReturns": true,
     "skipLibCheck": true,
-    "lib": ["es2019", "dom"],
+    "lib": ["es2021", "dom"],
     "types": [],
     "outDir": "./.tmp/build/",
     "rootDir": "."
