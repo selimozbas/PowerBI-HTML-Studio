@@ -1,0 +1,117 @@
+.hf-visual {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    font-family: var(--hf-font, "Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif);
+    color: var(--hf-foreground, #252423);
+    display: flex;
+    flex-direction: column;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .hf-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        overflow: auto;
+    }
+
+    .hf-row {
+        transition: opacity 120ms ease;
+    }
+
+    .hf-empty,
+    .hf-landing {
+        padding: 12px 14px;
+        color: var(--hf-muted, #605e5c);
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .hf-landing h3 {
+        margin: 0 0 6px;
+        color: var(--hf-foreground, #252423);
+    }
+
+    .hf-landing code,
+    .hf-debug code {
+        background: var(--hf-track, #e1dfdd);
+        border-radius: 3px;
+        padding: 0 4px;
+        font-size: 11px;
+    }
+
+    /* interactive components */
+    [data-hf-tab] {
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        padding: 6px 10px;
+        font: inherit;
+        color: var(--hf-muted, #605e5c);
+        border-bottom: 2px solid transparent;
+    }
+
+    [data-hf-tab].hf-active {
+        color: var(--hf-accent, #118dff);
+        border-bottom-color: var(--hf-accent, #118dff);
+    }
+
+    [data-hf-acc] {
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        text-align: left;
+        border: none;
+        background: transparent;
+        font: inherit;
+        padding: 8px 6px;
+        color: inherit;
+        border-bottom: 1px solid var(--hf-track, #e1dfdd);
+    }
+
+    [data-hf-acc]::before {
+        content: "\25B8";
+        display: inline-block;
+        margin-right: 6px;
+        transition: transform 120ms ease;
+    }
+
+    [data-hf-acc].hf-open::before {
+        transform: rotate(90deg);
+    }
+
+    /* diagnostics */
+    .hf-debug {
+        flex: 0 0 auto;
+        max-height: 40%;
+        overflow: auto;
+        border-top: 1px solid var(--hf-track, #e1dfdd);
+        background: var(--hf-background, #fff);
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+
+    .hf-debug-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .hf-debug-line {
+        padding: 2px 0;
+    }
+
+    .hf-debug .hf-error {
+        color: #a4262c;
+    }
+
+    .hf-debug .hf-warn {
+        color: #8a6d00;
+    }
+
+    .hf-debug .hf-ok {
+        color: #107c10;
+    }
+}

@@ -1,0 +1,181 @@
+{
+  "privileges": [
+    {
+      "name": "WebAccess",
+      "essential": false,
+      "parameters": ["https://fonts.googleapis.com", "https://fonts.gstatic.com"]
+    }
+  ],
+  "dataRoles": [
+    {
+      "displayName": "Content",
+      "description": "Column or measure that produces the HTML / SVG, or the value referenced by {{content}} in a template.",
+      "name": "content",
+      "kind": "GroupingOrMeasure"
+    },
+    {
+      "displayName": "Data (named fields)",
+      "description": "Extra columns or measures made available to templates by name, e.g. {{Revenue}}, {{Target}}.",
+      "name": "data",
+      "kind": "GroupingOrMeasure"
+    },
+    {
+      "displayName": "Sort by",
+      "description": "Optional field(s) used to order rows before rendering.",
+      "name": "sortBy",
+      "kind": "Grouping"
+    },
+    {
+      "displayName": "Tooltips",
+      "description": "Measures surfaced in the default Power BI tooltip.",
+      "name": "tooltips",
+      "kind": "Measure"
+    }
+  ],
+  "dataViewMappings": [
+    {
+      "conditions": [
+        {
+          "content": { "max": 1 },
+          "data": { "max": 20 },
+          "sortBy": { "max": 4 },
+          "tooltips": { "max": 20 }
+        }
+      ],
+      "table": {
+        "rows": {
+          "select": [
+            { "for": { "in": "content" } },
+            { "for": { "in": "data" } },
+            { "for": { "in": "sortBy" } },
+            { "for": { "in": "tooltips" } }
+          ],
+          "dataReductionAlgorithm": {
+            "window": { "count": 30000 }
+          }
+        }
+      }
+    }
+  ],
+  "objects": {
+    "content": {
+      "properties": {
+        "contentSource": {
+          "type": {
+            "enumeration": [
+              { "value": "value", "displayName": "Field value" },
+              { "value": "template", "displayName": "Template" }
+            ]
+          }
+        },
+        "renderMode": {
+          "type": {
+            "enumeration": [
+              { "value": "aggregate", "displayName": "Single block" },
+              { "value": "row", "displayName": "Per row" }
+            ]
+          }
+        },
+        "bodyTemplate": { "type": { "text": true } },
+        "rowTemplate": { "type": { "text": true } },
+        "separator": { "type": { "text": true } },
+        "unsafeAllowScripts": { "type": { "bool": true } },
+        "noDataMessage": { "type": { "text": true } }
+      }
+    },
+    "styling": {
+      "properties": {
+        "fontFamily": { "type": { "formatting": { "fontFamily": true } } },
+        "fontSize": { "type": { "formatting": { "fontSize": true } } },
+        "fontColor": { "type": { "fill": { "solid": { "color": true } } } },
+        "background": { "type": { "fill": { "solid": { "color": true } } } },
+        "align": {
+          "type": {
+            "enumeration": [
+              { "value": "left", "displayName": "Left" },
+              { "value": "center", "displayName": "Center" },
+              { "value": "right", "displayName": "Right" }
+            ]
+          }
+        },
+        "padding": { "type": { "numeric": true } },
+        "overflow": {
+          "type": {
+            "enumeration": [
+              { "value": "auto", "displayName": "Scroll" },
+              { "value": "hidden", "displayName": "Clip" },
+              { "value": "visible", "displayName": "Visible" }
+            ]
+          }
+        }
+      }
+    },
+    "stylesheet": {
+      "properties": {
+        "css": { "type": { "text": true } }
+      }
+    },
+    "conditionalFormatting": {
+      "properties": {
+        "enabled": { "type": { "bool": true } },
+        "rules": { "type": { "text": true } }
+      }
+    },
+    "components": {
+      "properties": {
+        "enabled": { "type": { "bool": true } },
+        "persistState": { "type": { "bool": true } }
+      }
+    },
+    "crossFilter": {
+      "properties": {
+        "enabled": { "type": { "bool": true } },
+        "transparencyPercent": { "type": { "numeric": true } },
+        "contextMenu": { "type": { "bool": true } }
+      }
+    },
+    "hyperlinks": {
+      "properties": {
+        "enabled": { "type": { "bool": true } }
+      }
+    },
+    "sanitization": {
+      "properties": {
+        "enabled": { "type": { "bool": true } },
+        "allowSvg": { "type": { "bool": true } },
+        "allowStyleTag": { "type": { "bool": true } },
+        "extraAllowedTags": { "type": { "text": true } },
+        "extraAllowedAttrs": { "type": { "text": true } }
+      }
+    },
+    "theme": {
+      "properties": {
+        "injectVars": { "type": { "bool": true } }
+      }
+    },
+    "accessibility": {
+      "properties": {
+        "ariaLabel": { "type": { "text": true } }
+      }
+    },
+    "debug": {
+      "properties": {
+        "showPanel": { "type": { "bool": true } }
+      }
+    },
+    "persistedState": {
+      "properties": {
+        "componentState": { "type": { "text": true } },
+        "editorContent": { "type": { "text": true } }
+      }
+    }
+  },
+  "supportsHighlight": false,
+  "supportsKeyboardFocus": true,
+  "supportsLandingPage": true,
+  "supportsMultiVisualSelection": true,
+  "tooltips": {
+    "supportedTypes": { "default": true, "canvas": true },
+    "roles": ["tooltips"]
+  }
+}

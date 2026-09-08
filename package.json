@@ -1,0 +1,35 @@
+{
+  "name": "powerbi-visuals-html-forge",
+  "version": "0.1.0",
+  "description": "Render column or measure values as HTML/SVG on the Power BI canvas, with a real templating engine, conditional formatting, interactive components and inline mini-charts.",
+  "license": "MIT",
+  "author": "Selim Ozbas <selimozbas@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dm-p/powerbi-visuals-html-content"
+  },
+  "scripts": {
+    "start": "pbiviz start",
+    "package": "pbiviz package",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.strict.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "dompurify": "^3.1.7",
+    "powerbi-visuals-api": "~5.11.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "eslint": "^9.12.0",
+    "eslint-plugin-powerbi-visuals": "^1.1.1",
+    "powerbi-visuals-tools": "^7.2.1",
+    "powerbi-visuals-utils-dataviewutils": "^7.0.0",
+    "powerbi-visuals-utils-formattingmodel": "^7.1.0",
+    "powerbi-visuals-utils-tooltiputils": "^7.1.0",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.2"
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+.tmp/
+dist/
+*.pbiviz
+.vscode/
+coverage/
+webpack.statistics.*.html

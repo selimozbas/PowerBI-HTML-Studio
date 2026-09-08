@@ -1,0 +1,25 @@
+{
+  "visual": {
+    "name": "htmlForge",
+    "displayName": "HTML Forge",
+    "guid": "htmlForge8f5def24026487ed5eb77af49c32fd1e",
+    "visualClassName": "Visual",
+    "version": "0.1.0.0",
+    "description": "Render column or measure values as HTML and SVG on the report canvas. Includes a templating engine with named fields, rule-based conditional formatting, sandbox-safe interactive components (tabs, accordion) and inline mini-charts.",
+    "supportUrl": "https://github.com/dm-p/powerbi-visuals-html-content/issues",
+    "gitHubUrl": "https://github.com/dm-p/powerbi-visuals-html-content"
+  },
+  "apiVersion": "5.11.0",
+  "author": {
+    "name": "Selim Ozbas",
+    "email": "selimozbas@gmail.com"
+  },
+  "assets": {
+    "icon": "assets/icon.png"
+  },
+  "externalJS": [],
+  "style": "style/visual.less",
+  "capabilities": "capabilities.json",
+  "dependencies": null,
+  "stringResources": []
+}

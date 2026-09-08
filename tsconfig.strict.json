@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noUnusedLocals": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "files": [],
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

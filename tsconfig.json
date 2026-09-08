@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es2019",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
+    "lib": ["es2019", "dom"],
+    "types": [],
+    "outDir": "./.tmp/build/",
+    "rootDir": "."
+  },
+  "files": [
+    "src/visual.ts"
+  ]
+}
