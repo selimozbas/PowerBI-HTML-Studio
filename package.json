@@ -6,7 +6,7 @@
   "author": "Selim Ozbas <selimozbas@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/selimozbas/powerbi-visuals-html-studio"
+    "url": "https://github.com/selimozbas/PowerBI-HTML-Studio"
   },
   "scripts": {
     "embed-bootstrap": "node scripts/embed-bootstrap.mjs",

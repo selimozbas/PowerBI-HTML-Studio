@@ -6,8 +6,8 @@
     "visualClassName": "Visual",
     "version": "0.1.0.0",
     "description": "Render HTML and SVG on the report canvas with a real templating engine, named data fields, a component library, interactive uPlot charts, Bootstrap 5 and a built-in Monaco editor. Rule-based conditional formatting, cross-filtering, an HTML slicer mode and viewer write-back, all without DAX string building.",
-    "supportUrl": "https://github.com/selimozbas/powerbi-visuals-html-studio/issues",
-    "gitHubUrl": "https://github.com/selimozbas/powerbi-visuals-html-studio"
+    "supportUrl": "https://github.com/selimozbas/PowerBI-HTML-Studio/issues",
+    "gitHubUrl": "https://github.com/selimozbas/PowerBI-HTML-Studio"
   },
   "apiVersion": "5.11.0",
   "author": {
