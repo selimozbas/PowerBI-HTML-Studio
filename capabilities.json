@@ -88,6 +88,9 @@
       "properties": {
         "fontFamily": { "type": { "formatting": { "fontFamily": true } } },
         "fontSize": { "type": { "formatting": { "fontSize": true } } },
+        "bold": { "type": { "bool": true } },
+        "italic": { "type": { "bool": true } },
+        "underline": { "type": { "bool": true } },
         "fontColor": { "type": { "fill": { "solid": { "color": true } } } },
         "background": { "type": { "fill": { "solid": { "color": true } } } },
         "align": {
@@ -192,6 +195,8 @@
     }
   },
   "supportsHighlight": false,
+  "supportsOnObjectFormatting": true,
+  "enablePointerEventsFormatMode": true,
   "supportsKeyboardFocus": true,
   "supportsLandingPage": true,
   "supportsMultiVisualSelection": true,

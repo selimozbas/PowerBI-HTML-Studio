@@ -26,9 +26,18 @@ import { renderLanding } from "./landing/landing";
 import { mountFragment, clearElement } from "./dom/inject";
 import { makeTranslator, Translate } from "./i18n";
 import { TemplateEditorDialog, EditorInitialState, EditorResultState } from "./dialog/templateEditorDialog";
+import {
+    HtmlSubSelectionHelper,
+    HtmlSubSelectableClass,
+    SubSelectableObjectNameAttribute,
+    SubSelectableDisplayNameAttribute,
+    SubSelectableTypeAttribute
+} from "powerbi-visuals-utils-onobjectutils";
+import { getSubSelectionStyles, getSubSelectionShortcuts, HF_OBJECT_MAP } from "./onObject/subSelection";
 
 import DialogAction = powerbi.DialogAction;
 import ViewMode = powerbi.ViewMode;
+import SubSelectionStylesType = powerbi.visuals.SubSelectionStylesType;
 
 /** Row count above which "per row" mode switches to windowed rendering. */
 const VIRTUALIZE_THRESHOLD = 250;
@@ -45,6 +54,7 @@ export class Visual implements IVisual {
     private selectionManager: ISelectionManager;
     private selectionBinder: SelectionBinder;
     private tooltipBinder: TooltipBinder;
+    private subSelectionHelper: HtmlSubSelectionHelper;
     private formattingService: FormattingSettingsService;
     private translate: Translate;
     private settings!: VisualFormattingSettingsModel;
@@ -84,6 +94,15 @@ export class Visual implements IVisual {
         this.editBtn.hidden = true;
         this.editBtn.addEventListener("click", () => this.openTemplateEditor());
 
+        this.subSelectionHelper = HtmlSubSelectionHelper.createHtmlSubselectionHelper({
+            hostElement: this.contentEl,
+            subSelectionService: this.host.subSelectionService
+        });
+        this.contentEl.classList.add(HtmlSubSelectableClass);
+        this.contentEl.setAttribute(SubSelectableObjectNameAttribute, "styling");
+        this.contentEl.setAttribute(SubSelectableDisplayNameAttribute, "Content style");
+        this.contentEl.setAttribute(SubSelectableTypeAttribute, String(SubSelectionStylesType.Text));
+
         this.root.appendChild(this.styleEl);
         this.root.appendChild(this.contentEl);
         this.root.appendChild(this.debugEl);
@@ -117,6 +136,10 @@ export class Visual implements IVisual {
             } else {
                 this.renderModel(model);
             }
+
+            this.subSelectionHelper.setFormatMode(!!options.formatMode);
+            this.subSelectionHelper.updateOutlinesFromSubSelections(options.subSelections ?? []);
+
             this.events.renderingFinished(options);
         } catch (err) {
             this.events.renderingFailed(options, String(err));
@@ -189,6 +212,7 @@ export class Visual implements IVisual {
                     return slice.fragment;
                 },
                 afterRender: () => {
+                    this.markAuthorObjects();
                     if (this.allowInteractions()) {
                         this.selectionBinder.applyDim(this.contentEl, this.currentSelectionOptions());
                     }
@@ -198,6 +222,7 @@ export class Visual implements IVisual {
             const sanitized = sanitizeToFragment(rendered.html, sanOpts);
             removed = sanitized.removed;
             mountFragment(this.contentEl, sanitized.fragment);
+            this.markAuthorObjects();
         }
 
         this.contentEl.setAttribute(
@@ -246,6 +271,44 @@ export class Visual implements IVisual {
         return this.formattingService.buildFormattingModel(this.settings);
     }
 
+    public visualOnObjectFormatting: powerbi.extensibility.visual.VisualOnObjectFormatting = {
+        getSubSelectionStyles: (subSelections) => getSubSelectionStyles(subSelections),
+        getSubSelectionShortcuts: (subSelections) => getSubSelectionShortcuts(subSelections, this.cardUid("styling")),
+        getSubSelectables: (filter) => this.subSelectionHelper.getAllSubSelectables(filter)
+    };
+
+    public destroy(): void {
+        this.teardownDynamic();
+        this.subSelectionHelper.destroy();
+    }
+
+    /**
+     * Translate author-placed `data-hf-object="..."` hooks in the rendered
+     * content into the real sub-selection attributes the helper understands.
+     */
+    private markAuthorObjects(): void {
+        this.contentEl.querySelectorAll<HTMLElement>("[data-hf-object]").forEach((el) => {
+            const key = (el.getAttribute("data-hf-object") || "").toLowerCase();
+            const objectName = HF_OBJECT_MAP[key];
+            if (!objectName) return;
+            el.classList.add(HtmlSubSelectableClass);
+            el.setAttribute(SubSelectableObjectNameAttribute, objectName);
+            el.setAttribute(SubSelectableDisplayNameAttribute, el.getAttribute("data-hf-object-label") || key);
+            el.setAttribute(SubSelectableTypeAttribute, String(SubSelectionStylesType.Text));
+        });
+    }
+
+    private cardUid(objectName: string): string {
+        try {
+            const model = this.formattingService.buildFormattingModel(this.settings);
+            const cards = (model as unknown as { cards?: Array<{ uid?: string }> }).cards || [];
+            const hit = cards.find((c) => typeof c.uid === "string" && c.uid.indexOf(objectName) === 0);
+            return hit?.uid || objectName;
+        } catch {
+            return objectName;
+        }
+    }
+
     /* --------------------------- helpers ------------------------------ */
 
     private allowInteractions(): boolean {
@@ -288,6 +351,9 @@ export class Visual implements IVisual {
         const c = this.contentEl.style;
         c.fontFamily = st.font.fontFamily.value;
         c.fontSize = `${st.font.fontSize.value}px`;
+        c.fontWeight = st.font.bold?.value ? "bold" : "";
+        c.fontStyle = st.font.italic?.value ? "italic" : "";
+        c.textDecoration = st.font.underline?.value ? "underline" : "";
         c.color = st.fontColor.value.value;
         c.textAlign = this.enumValue(st.align.value, "left");
         c.padding = `${st.padding.value}px`;

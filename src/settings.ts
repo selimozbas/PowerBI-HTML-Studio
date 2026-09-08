@@ -105,7 +105,10 @@ class StylingCard extends Card {
             displayName: "Text size",
             value: 12,
             options: { minValue: { value: 6, type: 0 }, maxValue: { value: 60, type: 1 } }
-        })
+        }),
+        bold: new formattingSettings.ToggleSwitch({ name: "bold", displayName: "Bold", value: false }),
+        italic: new formattingSettings.ToggleSwitch({ name: "italic", displayName: "Italic", value: false }),
+        underline: new formattingSettings.ToggleSwitch({ name: "underline", displayName: "Underline", value: false })
     });
 
     fontColor = new formattingSettings.ColorPicker({
