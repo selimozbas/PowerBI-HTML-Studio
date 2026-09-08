@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>HTML Studio — template editor</title>
+<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+<link rel="stylesheet" href="shot-frame.css">
+<style>
+  body { background: #eaeaea; }
+  .backdrop { position:absolute; inset:0; background:rgba(20,18,30,.45); }
+  .dialog {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:1120px; height:632px; background:#fff; border-radius:10px;
+    box-shadow:0 24px 64px rgba(0,0,0,.35); display:flex; flex-direction:column; overflow:hidden;
+  }
+  .dhead { height:44px; flex:0 0 44px; display:flex; align-items:center; gap:10px; padding:0 14px;
+    border-bottom:1px solid #e1dfdd; font-weight:600; font-size:14px; }
+  .dhead .bi { color:#8a4bff; }
+  .dhead .spacer { flex:1; }
+  .tabs { display:flex; gap:2px; padding:8px 14px 0; border-bottom:1px solid #e1dfdd; }
+  .tabs .t { font-size:12px; padding:6px 12px; border:1px solid transparent; border-bottom:none;
+    border-radius:6px 6px 0 0; color:#605e5c; cursor:default; }
+  .tabs .t.on { background:#fff; border-color:#e1dfdd; color:#252423; font-weight:600; }
+  .body { flex:1; display:flex; min-height:0; }
+  .pane { flex:1; min-width:0; display:flex; flex-direction:column; }
+  .pane + .pane { border-left:1px solid #e1dfdd; }
+  .pane .ph { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#8a8886;
+    padding:6px 12px; border-bottom:1px solid #eee; background:#faf9f8; }
+
+  /* code editor */
+  .editor { flex:1; overflow:hidden; background:#1e1e2e; color:#cdd6f4; font:13px/1.6 "SF Mono",ui-monospace,Menlo,Consolas,monospace; padding:10px 0; }
+  .editor .ln { display:flex; }
+  .editor .g { width:38px; flex:0 0 38px; text-align:right; padding-right:10px; color:#585b70; user-select:none; }
+  .editor .c { white-space:pre; }
+  .kw { color:#cba6f7; } .str { color:#a6e3a1; } .fn { color:#89b4fa; } .tag { color:#f38ba8; }
+  .att { color:#fab387; } .mut { color:#9399b2; }
+  .marker { background:rgba(243,139,168,.18); border-bottom:2px wavy #f38ba8; }
+
+  /* live preview */
+  .preview { flex:1; overflow:auto; padding:14px; background:#fff;
+    -webkit-mask-image: linear-gradient(#000 88%, transparent 100%); }
+  .gallery { display:flex; gap:8px; padding:8px 12px; border-top:1px solid #e1dfdd; background:#faf9f8; overflow:hidden; }
+  .gallery .card-mini { font-size:11px; border:1px solid #e1dfdd; border-radius:6px; padding:6px 10px; color:#605e5c; white-space:nowrap; }
+  .gallery .card-mini.sel { border-color:#8a4bff; color:#252423; background:#f3ecff; }
+  .dfoot { height:52px; flex:0 0 52px; display:flex; align-items:center; justify-content:flex-end; gap:8px;
+    padding:0 14px; border-top:1px solid #e1dfdd; }
+  .lint { font-size:11px; color:#8a8886; padding:4px 12px; border-top:1px solid #eee; }
+  .lint .ok { color:#107c10; }
+</style>
+
+<div class="pbi">
+  <div class="pbi-topbar">
+    <span class="dot">P</span><span class="title">Sales performance</span>
+    <span class="spacer"></span><span class="chip"><i class="bi bi-pencil"></i> Editing</span>
+  </div>
+  <div class="pbi-body"><div class="pbi-canvas" style="grid-template-columns:1fr;grid-template-rows:1fr;">
+    <div class="tile"><div class="cap">Regional scorecard — HTML Studio</div><div class="bd"></div></div>
+  </div></div>
+</div>
+
+<div class="backdrop"></div>
+<div class="dialog">
+  <div class="dhead"><i class="bi bi-code-square"></i> Template editor
+    <span class="spacer"></span><span class="mut small text-secondary">hf-template · content field: <b>Region</b></span>
+  </div>
+  <div class="tabs">
+    <div class="t on">Template</div><div class="t">Bound data</div><div class="t">Preview</div>
+  </div>
+  <div class="body">
+    <div class="pane">
+      <div class="ph">Template</div>
+      <div class="editor">
+        <div class="ln"><span class="g">1</span><span class="c"><span class="kw">{{#each</span> rows<span class="kw">}}</span></span></div>
+        <div class="ln"><span class="g">2</span><span class="c">  <span class="tag">&lt;div</span> <span class="att">class</span>=<span class="str">"card mb-2"</span><span class="tag">&gt;</span><span class="tag">&lt;div</span> <span class="att">class</span>=<span class="str">"card-body py-2"</span><span class="tag">&gt;</span></span></div>
+        <div class="ln"><span class="g">3</span><span class="c">    <span class="tag">&lt;div</span> <span class="att">class</span>=<span class="str">"d-flex justify-content-between"</span><span class="tag">&gt;</span></span></div>
+        <div class="ln"><span class="g">4</span><span class="c">      <span class="tag">&lt;span</span> <span class="att">class</span>=<span class="str">"fw-semibold"</span><span class="tag">&gt;</span><span class="kw">{{</span>Region<span class="kw">}}</span><span class="tag">&lt;/span&gt;</span></span></div>
+        <div class="ln"><span class="g">5</span><span class="c">      <span class="kw">{{&gt;</span> <span class="fn">pill</span> text=Status good=<span class="str">"On track"</span><span class="kw">}}</span></span></div>
+        <div class="ln"><span class="g">6</span><span class="c">    <span class="tag">&lt;/div&gt;</span></span></div>
+        <div class="ln"><span class="g">7</span><span class="c">    <span class="kw">{{&gt;</span> <span class="fn">kpi</span> label=<span class="str">"Revenue"</span> value=Actual target=Target unit=<span class="str">"$"</span><span class="kw">}}</span></span></div>
+        <div class="ln"><span class="g">8</span><span class="c">    <span class="tag">&lt;div</span> <span class="att">class</span>=<span class="str">"small text-secondary mt-1"</span><span class="tag">&gt;</span></span></div>
+        <div class="ln"><span class="g">9</span><span class="c">      <span class="fn">relativeTime</span>(LastClose) · <span class="fn">initials</span>(Owner)</span></div>
+        <div class="ln"><span class="g">10</span><span class="c">    <span class="tag">&lt;/div&gt;</span></span></div>
+        <div class="ln"><span class="g">11</span><span class="c">  <span class="tag">&lt;/div&gt;&lt;/div&gt;</span></span></div>
+        <div class="ln"><span class="g">12</span><span class="c"><span class="kw">{{#if</span> Actual <span class="kw">&lt;</span> <span class="fn">mul</span>(Target,<span class="str">0.8</span>)<span class="kw">}}</span></span></div>
+        <div class="ln"><span class="g">13</span><span class="c">  <span class="kw">{{&gt;</span> <span class="fn">calloutCard</span> variant=<span class="str">"warning"</span> title=<span class="str">"Below plan"</span> text=Note<span class="kw">}}</span></span></div>
+        <div class="ln"><span class="g">14</span><span class="c"><span class="kw">{{/if}}</span></span></div>
+        <div class="ln"><span class="g">15</span><span class="c"><span class="kw">{{/each}}</span></span></div>
+      </div>
+      <div class="lint"><i class="bi bi-check-circle-fill ok"></i> <span class="ok">No problems.</span> &nbsp; 15 lines · 4 helpers · 3 components</div>
+    </div>
+
+    <div class="pane">
+      <div class="ph">Live preview <span class="text-secondary">— first 3 of 128 rows (scroll)</span></div>
+      <div class="preview">
+        <div class="card mb-2"><div class="card-body py-2">
+          <div class="d-flex justify-content-between"><span class="fw-semibold">EMEA</span><span class="badge rounded-pill text-bg-success">On track</span></div>
+          <div class="text-secondary small">Revenue</div>
+          <div class="fs-5 fw-semibold">$2,360,000</div>
+          <div class="d-flex align-items-center gap-2"><div class="progress flex-grow-1" style="height:6px"><div class="progress-bar bg-success" style="width:113%"></div></div><span class="small text-secondary">113%</span></div>
+          <div class="small text-secondary mt-1">2 days ago · JL</div>
+        </div></div>
+        <div class="card mb-2"><div class="card-body py-2">
+          <div class="d-flex justify-content-between"><span class="fw-semibold">North</span><span class="badge rounded-pill text-bg-success">On track</span></div>
+          <div class="text-secondary small">Revenue</div>
+          <div class="fs-5 fw-semibold">$1,840,000</div>
+          <div class="d-flex align-items-center gap-2"><div class="progress flex-grow-1" style="height:6px"><div class="progress-bar bg-success" style="width:106%"></div></div><span class="small text-secondary">106%</span></div>
+          <div class="small text-secondary mt-1">5 hours ago · AO</div>
+        </div></div>
+        <div class="card mb-2"><div class="card-body py-2">
+          <div class="d-flex justify-content-between"><span class="fw-semibold">APAC</span><span class="badge rounded-pill text-bg-secondary">At risk</span></div>
+          <div class="text-secondary small">Revenue</div>
+          <div class="fs-5 fw-semibold">$940,000</div>
+          <div class="d-flex align-items-center gap-2"><div class="progress flex-grow-1" style="height:6px"><div class="progress-bar bg-warning" style="width:71%"></div></div><span class="small text-secondary">71%</span></div>
+          <div class="alert alert-warning d-flex gap-2 py-2 mt-2 mb-0"><i class="bi bi-info-circle fs-5"></i><div><div class="fw-semibold">Below plan</div><div class="small">Pipeline coverage 1.4x; forecast revised down 6%.</div></div></div>
+        </div></div>
+      </div>
+      <div class="gallery">
+        <span class="text-secondary small align-self-center me-1">Start from:</span>
+        <div class="card-mini sel">Scorecard cards</div>
+        <div class="card-mini">KPI grid</div>
+        <div class="card-mini">Table → cards</div>
+        <div class="card-mini">Timeline</div>
+        <div class="card-mini">Pass-through HTML</div>
+      </div>
+    </div>
+  </div>
+  <div class="dfoot">
+    <button class="btn btn-sm btn-light">Cancel</button>
+    <button class="btn btn-sm btn-primary" style="background:#5b34d6;border-color:#5b34d6">Apply template</button>
+  </div>
+</div>

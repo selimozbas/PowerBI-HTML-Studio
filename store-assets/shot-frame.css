@@ -1,0 +1,45 @@
+/* Shared Power BI report-page chrome for the store screenshots.
+   1280x720, light theme. */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  width: 1280px; height: 720px; overflow: hidden;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: #eaeaea; color: #252423;
+}
+.pbi { width: 1280px; height: 720px; display: flex; flex-direction: column; }
+
+.pbi-topbar {
+  height: 44px; flex: 0 0 44px; background: #f3f2f1; border-bottom: 1px solid #d9d9d9;
+  display: flex; align-items: center; gap: 12px; padding: 0 14px; font-size: 13px;
+}
+.pbi-topbar .dot { width: 22px; height: 22px; border-radius: 5px; background: #f2c811; display: grid; place-items: center; color: #4a3f00; font-weight: 800; font-size: 12px; }
+.pbi-topbar .title { font-weight: 600; }
+.pbi-topbar .spacer { flex: 1; }
+.pbi-topbar .chip { color: #605e5c; }
+
+.pbi-body { flex: 1; display: flex; min-height: 0; }
+.pbi-canvas { flex: 1; padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.pbi-filters {
+  width: 220px; flex: 0 0 220px; background: #f3f2f1; border-left: 1px solid #d9d9d9;
+  padding: 12px 14px; font-size: 12px;
+}
+.pbi-filters h4 { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #605e5c; }
+.pbi-filters .f { padding: 8px 0; border-bottom: 1px solid #e1dfdd; }
+.pbi-filters .f .n { font-weight: 600; }
+.pbi-filters .f .v { color: #605e5c; }
+
+.tile {
+  background: #fff; border: 1px solid #e1dfdd; border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06); overflow: hidden; display: flex; flex-direction: column;
+}
+.tile > .cap { font-size: 12px; font-weight: 600; color: #323130; padding: 8px 12px 4px; }
+.tile > .bd { flex: 1; min-height: 0; overflow: auto; padding: 6px 12px 12px; }
+
+/* the HTML Studio visual gets a faint highlight ring so it reads as the hero */
+.tile.hero { border-color: #8a4bff; box-shadow: 0 0 0 2px rgba(138,75,255,.18), 0 2px 8px rgba(0,0,0,.08); }
+.tile.hero > .cap::before { content: "▦ "; color: #8a4bff; }
+
+/* mini CSS bar chart for sibling tiles */
+.minibars { display: flex; align-items: flex-end; gap: 10px; height: 100%; padding: 8px 4px; }
+.minibars > i { flex: 1; background: linear-gradient(#8a4bff, #5b34d6); border-radius: 3px 3px 0 0; }

@@ -1,0 +1,24 @@
+{{#each rows}}
+  <div class="card mb-2">
+    <div class="card-body py-2">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <span class="fw-semibold">{{Region}}</span>
+          <span class="text-secondary small">· {{Segment}}</span>
+        </div>
+        {{> pill text=Status good="On track"}}
+      </div>
+
+      {{> kpi label="Revenue" value=Actual target=Target unit="$"}}
+
+      <div class="d-flex align-items-center gap-2 mt-1">
+        {{> deltaBadge value=Actual base=Prev}}
+        <span class="small text-secondary">vs. last quarter · closed {{relativeTime(LastClose)}} · {{initials(Owner)}}</span>
+      </div>
+
+      {{#if Actual < mul(Target, 0.8)}}
+        {{> calloutCard variant="warning" title="Below plan" text=Note}}
+      {{/if}}
+    </div>
+  </div>
+{{/each}}

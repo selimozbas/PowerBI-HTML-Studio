@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML Studio — Privacy Policy</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px;
+    font: 16px/1.65 "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: #24202b; background: #fff; }
+  @media (prefers-color-scheme: dark) { body { color: #e8e6ee; background: #17151d; } a { color: #b79bff; } code { background:#2a2733; } }
+  h1 { font-size: 1.7rem; margin: 0 0 .2em; }
+  h2 { font-size: 1.15rem; margin: 2em 0 .5em; }
+  .sub { color: #6c6878; margin: 0 0 2em; }
+  code { background: #f0eef5; border-radius: 4px; padding: .1em .35em; font-size: .9em; }
+  ul { padding-left: 1.3em; }
+  li { margin: .4em 0; }
+  a { color: #5b34d6; }
+  footer { margin-top: 3em; padding-top: 1em; border-top: 1px solid #ccc8d6; color: #6c6878; font-size: .9em; }
+</style>
+</head>
+<body>
+  <h1>HTML Studio — Privacy Policy</h1>
+  <p class="sub">Power BI custom visual · last updated 8 September 2026</p>
+
+  <p><strong>HTML Studio</strong> renders the data you place in its field wells as
+  HTML/SVG on the report canvas. It has no backend and collects no analytics or
+  telemetry.</p>
+
+  <h2>What data the visual sees</h2>
+  <ul>
+    <li>The rows bound to the <strong>Content</strong>, <strong>Data</strong>,
+      <strong>Sort by</strong> and <strong>Tooltips</strong> field wells, plus the
+      format strings Power BI provides for them. This data is processed
+      <strong>only inside the visual's sandboxed iframe</strong>, in the viewer's
+      browser or Power BI Desktop, to produce the rendered output. It is never
+      sent off the client by the visual.</li>
+    <li>Template text, CSS, conditional-formatting rules and other options you
+      type into the format pane.</li>
+  </ul>
+
+  <h2>Data the visual stores</h2>
+  <ul>
+    <li><strong>Remember form input</strong> (write-back), when you enable it,
+      saves the values a viewer types into <code>data-hf-field</code> inputs back
+      into the report definition via Power BI's <code>persistProperties</code>
+      API. That state lives in the <code>.pbix</code> / dataset like any other
+      visual property. It is written only if the viewer has edit rights; a
+      read-only Power BI Service viewer's input is not persisted. Nothing is sent
+      to any third party.</li>
+  </ul>
+
+  <h2>Network requests</h2>
+  <ul>
+    <li>The visual bundles all of its code and libraries (Monaco editor,
+      DOMPurify, uPlot, Bootstrap, marked, QR generator). Nothing is loaded from
+      a CDN.</li>
+    <li>The <strong>only</strong> outbound request the visual can make is to
+      <code>https://fonts.googleapis.com</code> and
+      <code>https://fonts.gstatic.com</code>, and only when you enter a Google
+      Fonts family name in <strong>Appearance → Google font</strong>. This uses
+      the declared, non-essential <code>WebAccess</code> privilege. Leave that
+      field blank and the visual makes no network requests at all. Google's
+      handling of those font requests is covered by the
+      <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <p>Questions or concerns: open an issue at
+    <a href="https://github.com/selimozbas/PowerBI-HTML-Studio/issues">github.com/selimozbas/PowerBI-HTML-Studio/issues</a>.</p>
+
+  <footer>
+    HTML Studio is open source (MIT). Not affiliated with or endorsed by Microsoft.
+  </footer>
+</body>
+</html>

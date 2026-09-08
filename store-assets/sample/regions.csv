@@ -1,0 +1,9 @@
+Region,Segment,Actual,Target,Prev,Owner,Status,LastClose,Note
+North,Enterprise,1840000,1735000,1610000,Ada Okoro,On track,2026-09-03,Strong renewals quarter
+South,Enterprise,1120000,1365000,1180000,Rui Kato,At risk,2026-09-01,Two deals slipped to Q4
+EMEA,Enterprise,2360000,2090000,1990000,Jonas Lind,On track,2026-09-06,Multi-year renewal booked early
+APAC,Enterprise,940000,1320000,1010000,Priya Shah,At risk,2026-08-30,Pipeline coverage only 1.4x
+North,SMB,610000,560000,540000,Ada Okoro,On track,2026-09-04,Self-serve conversions up
+South,SMB,395000,430000,410000,Rui Kato,Watch,2026-09-02,Churn ticked up in August
+EMEA,SMB,720000,655000,600000,Jonas Lind,On track,2026-09-05,Partner channel outperforming
+APAC,SMB,280000,360000,300000,Priya Shah,At risk,2026-08-29,Onboarding backlog

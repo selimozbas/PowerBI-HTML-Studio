@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>HTML Studio — status board</title>
+<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+<link rel="stylesheet" href="shot-frame.css">
+<style>
+  .pbi-canvas { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+  table.board { width:100%; border-collapse:separate; border-spacing:0 6px; font-size:13px; }
+  table.board th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:#8a8886; padding:0 10px 2px; font-weight:600; }
+  table.board td { background:#fff; padding:9px 10px; vertical-align:middle; border-top:1px solid #eee; border-bottom:1px solid #eee; }
+  table.board td:first-child { border-left:1px solid #eee; border-radius:6px 0 0 6px; }
+  table.board td:last-child  { border-right:1px solid #eee; border-radius:0 6px 6px 0; }
+  /* conditional formatting: rule-driven left border + tint */
+  tr.rag-r td { background:#fdf1f1; } tr.rag-r td:first-child { box-shadow: inset 3px 0 0 #d13438; }
+  tr.rag-a td { background:#fdf8ee; } tr.rag-a td:first-child { box-shadow: inset 3px 0 0 #d9a300; }
+  tr.rag-g td { background:#f1f9f2; } tr.rag-g td:first-child { box-shadow: inset 3px 0 0 #107c10; }
+  .heat { display:inline-block; min-width:44px; text-align:center; padding:2px 6px; border-radius:4px; font-weight:600; color:#fff; }
+  .av { width:24px;height:24px;border-radius:50%;background:#e6def9;color:#5b34d6;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-left:-5px;border:1.5px solid #fff; }
+  .av:first-child { margin-left:0; }
+  .slicer { display:flex; gap:6px; margin-bottom:10px; }
+  .slicer .chip2 { font-size:12px; border:1px solid #d9d9d9; border-radius:999px; padding:3px 12px; color:#605e5c; }
+  .slicer .chip2.on { background:#5b34d6; border-color:#5b34d6; color:#fff; }
+</style>
+
+<div class="pbi">
+  <div class="pbi-topbar">
+    <span class="dot">P</span><span class="title">Delivery portfolio</span>
+    <span class="chip">28 active projects</span>
+    <span class="spacer"></span>
+    <span class="chip"><i class="bi bi-funnel"></i> Status: Active</span>
+    <span class="chip"><i class="bi bi-box-arrow-up-right"></i> Export</span>
+  </div>
+  <div class="pbi-body">
+    <div class="pbi-canvas">
+      <div class="tile hero">
+        <div class="cap">Project status board — HTML Studio &nbsp;·&nbsp; table → cards, JSON conditional-formatting rules, HTML slicer</div>
+        <div class="bd">
+          <div class="hf">
+            <div class="slicer">
+              <span class="chip2 on" data-hf-filter="Health:all">All</span>
+              <span class="chip2" data-hf-filter="Health:red">At risk</span>
+              <span class="chip2" data-hf-filter="Health:amber">Watch</span>
+              <span class="chip2" data-hf-filter="Health:green">Healthy</span>
+            </div>
+            <table class="board">
+              <thead><tr>
+                <th style="width:220px">Project</th><th>Owners</th><th style="width:120px">Health</th>
+                <th style="width:110px">Budget</th><th style="width:130px">Burn</th>
+                <th style="width:90px">CSAT</th><th style="width:120px">Trend</th>
+              </tr></thead>
+              <tbody>
+                <tr class="rag-r">
+                  <td><div class="fw-semibold">Atlas migration</div><div class="small text-secondary">Platform</div></td>
+                  <td><span class="d-inline-flex"><span class="av">RM</span><span class="av">TK</span><span class="av">JD</span></span></td>
+                  <td><span class="badge rounded-pill text-bg-danger">At risk</span></td>
+                  <td>$820K</td>
+                  <td><span class="heat" style="background:#d13438">128%</span></td>
+                  <td>★★★☆☆</td>
+                  <td><svg viewBox="0 0 100 22" width="100" height="22"><polyline fill="none" stroke="#d13438" stroke-width="2" points="0,6 20,8 40,7 60,12 80,15 100,19"/></svg></td>
+                </tr>
+                <tr class="rag-a">
+                  <td><div class="fw-semibold">Beacon analytics</div><div class="small text-secondary">Data</div></td>
+                  <td><span class="d-inline-flex"><span class="av">AO</span><span class="av">LP</span></span></td>
+                  <td><span class="badge rounded-pill text-bg-warning">Watch</span></td>
+                  <td>$310K</td>
+                  <td><span class="heat" style="background:#d9a300">96%</span></td>
+                  <td>★★★★☆</td>
+                  <td><svg viewBox="0 0 100 22" width="100" height="22"><polyline fill="none" stroke="#d9a300" stroke-width="2" points="0,14 20,12 40,13 60,10 80,12 100,9"/></svg></td>
+                </tr>
+                <tr class="rag-g">
+                  <td><div class="fw-semibold">Cobalt portal</div><div class="small text-secondary">Web</div></td>
+                  <td><span class="d-inline-flex"><span class="av">MS</span><span class="av">KW</span><span class="av">RB</span></span></td>
+                  <td><span class="badge rounded-pill text-bg-success">Healthy</span></td>
+                  <td>$540K</td>
+                  <td><span class="heat" style="background:#107c10">71%</span></td>
+                  <td>★★★★★</td>
+                  <td><svg viewBox="0 0 100 22" width="100" height="22"><polyline fill="none" stroke="#107c10" stroke-width="2" points="0,18 20,16 40,17 60,12 80,10 100,5"/></svg></td>
+                </tr>
+                <tr class="rag-g">
+                  <td><div class="fw-semibold">Delta payments</div><div class="small text-secondary">Fintech</div></td>
+                  <td><span class="d-inline-flex"><span class="av">JV</span><span class="av">ET</span></span></td>
+                  <td><span class="badge rounded-pill text-bg-success">Healthy</span></td>
+                  <td>$1.2M</td>
+                  <td><span class="heat" style="background:#107c10">83%</span></td>
+                  <td>★★★★☆</td>
+                  <td><svg viewBox="0 0 100 22" width="100" height="22"><polyline fill="none" stroke="#107c10" stroke-width="2" points="0,15 20,14 40,11 60,12 80,8 100,7"/></svg></td>
+                </tr>
+                <tr class="rag-a">
+                  <td><div class="fw-semibold">Echo mobile</div><div class="small text-secondary">Apps</div></td>
+                  <td><span class="d-inline-flex"><span class="av">HN</span><span class="av">GD</span><span class="av">PS</span></span></td>
+                  <td><span class="badge rounded-pill text-bg-warning">Watch</span></td>
+                  <td>$260K</td>
+                  <td><span class="heat" style="background:#d9a300">104%</span></td>
+                  <td>★★★☆☆</td>
+                  <td><svg viewBox="0 0 100 22" width="100" height="22"><polyline fill="none" stroke="#d9a300" stroke-width="2" points="0,10 20,11 40,9 60,13 80,12 100,14"/></svg></td>
+                </tr>
+                <tr class="rag-r">
+                  <td><div class="fw-semibold">Falcon warehouse</div><div class="small text-secondary">Ops</div></td>
+                  <td><span class="d-inline-flex"><span class="av">DK</span><span class="av">MB</span></span></td>
+                  <td><span class="badge rounded-pill text-bg-danger">At risk</span></td>
+                  <td>$430K</td>
+                  <td><span class="heat" style="background:#d13438">141%</span></td>
+                  <td>★★☆☆☆</td>
+                  <td><svg viewBox="0 0 100 22" width="100" height="22"><polyline fill="none" stroke="#d13438" stroke-width="2" points="0,8 20,10 40,13 60,14 80,17 100,20"/></svg></td>
+                </tr>
+                <tr class="rag-g">
+                  <td><div class="fw-semibold">Gamma CRM</div><div class="small text-secondary">Sales</div></td>
+                  <td><span class="d-inline-flex"><span class="av">CT</span><span class="av">NW</span></span></td>
+                  <td><span class="badge rounded-pill text-bg-success">Healthy</span></td>
+                  <td>$690K</td>
+                  <td><span class="heat" style="background:#107c10">64%</span></td>
+                  <td>★★★★★</td>
+                  <td><svg viewBox="0 0 100 22" width="100" height="22"><polyline fill="none" stroke="#107c10" stroke-width="2" points="0,16 20,15 40,13 60,11 80,9 100,6"/></svg></td>
+                </tr>
+                <tr class="rag-a">
+                  <td><div class="fw-semibold">Helix billing</div><div class="small text-secondary">Fintech</div></td>
+                  <td><span class="d-inline-flex"><span class="av">SR</span><span class="av">BM</span><span class="av">QL</span></span></td>
+                  <td><span class="badge rounded-pill text-bg-warning">Watch</span></td>
+                  <td>$375K</td>
+                  <td><span class="heat" style="background:#d9a300">92%</span></td>
+                  <td>★★★★☆</td>
+                  <td><svg viewBox="0 0 100 22" width="100" height="22"><polyline fill="none" stroke="#d9a300" stroke-width="2" points="0,12 20,13 40,11 60,12 80,10 100,11"/></svg></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="small text-secondary mt-1">Rows sorted by <b>Health</b> then <b>Burn %</b> · colours from a 6-line JSON rule set · <b>+ 20 more rows</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pbi-filters">
+      <h4>Filters</h4>
+      <div class="f"><div class="n">Portfolio</div><div class="v">Delivery</div></div>
+      <div class="f"><div class="n">Status</div><div class="v">Active</div></div>
+      <div class="f"><div class="n">Health (slicer)</div><div class="v">All</div></div>
+      <div class="f"><div class="n">Region</div><div class="v">is not blank</div></div>
+    </div>
+  </div>
+</div>

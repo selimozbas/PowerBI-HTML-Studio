@@ -1,0 +1,40 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>icon</title>
+<style>
+  html,body{margin:0;padding:0}
+  .wrap{width:300px;height:300px;overflow:hidden}
+  svg{display:block}
+</style>
+<div class="wrap">
+<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b1a6b"/>
+      <stop offset="0.55" stop-color="#5b34d6"/>
+      <stop offset="1" stop-color="#8a4bff"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="300" height="300" rx="66" fill="url(#bg)"/>
+  <rect x="0" y="0" width="300" height="300" rx="66" fill="url(#sheen)"/>
+
+  <!-- editor canvas card -->
+  <rect x="52" y="66" width="196" height="168" rx="20" fill="#ffffff" opacity="0.10"/>
+  <rect x="52" y="66" width="196" height="40" rx="20" fill="#ffffff" opacity="0.10"/>
+  <circle cx="76" cy="86" r="6" fill="#ff6b6b"/>
+  <circle cx="98" cy="86" r="6" fill="#ffd166"/>
+  <circle cx="120" cy="86" r="6" fill="#5ee6a8"/>
+
+  <!-- code mark, centred in the card body -->
+  <g fill="none" stroke="#ffffff" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="121,148 96,174 121,200"/>
+    <polyline points="179,148 204,174 179,200"/>
+  </g>
+  <line x1="160" y1="143" x2="140" y2="205" stroke="#ffd166" stroke-width="15" stroke-linecap="round"/>
+</svg>
+</div>

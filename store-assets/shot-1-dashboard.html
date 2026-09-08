@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>HTML Studio — scorecard</title>
+<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+<link rel="stylesheet" href="shot-frame.css">
+<style>
+  .pbi-canvas { grid-template-columns: 2.1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .hero { grid-row: 1 / span 2; }
+  /* content that the visual renders from the "Region" table */
+  .hf .card { border-color: #ebe9e7; }
+  .hf .card-body { padding: .6rem .75rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .spark { display:block; }
+</style>
+
+<div class="pbi">
+  <div class="pbi-topbar">
+    <span class="dot">P</span>
+    <span class="title">Sales performance</span>
+    <span class="chip">Q3 FY26</span>
+    <span class="spacer"></span>
+    <span class="chip"><i class="bi bi-arrow-clockwise"></i> Refreshed 2 min ago</span>
+    <span class="chip"><i class="bi bi-share"></i> Share</span>
+  </div>
+  <div class="pbi-body">
+    <div class="pbi-canvas">
+
+      <div class="tile hero">
+        <div class="cap">Regional scorecard — HTML Studio</div>
+        <div class="bd">
+          <div class="hf grid">
+
+            <!-- {{> kpi}} + {{> gauge}} + {{> sparkRow}} per region row -->
+            <div class="card"><div class="card-body">
+              <div class="text-secondary small text-truncate">North · Revenue</div>
+              <div class="fs-4 fw-semibold">$1.84M</div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height:6px"><div class="progress-bar bg-success" style="width:106%"></div></div>
+                <span class="small text-secondary">106%</span>
+              </div>
+              <svg class="spark mt-2" viewBox="0 0 120 26" width="100%" height="26" preserveAspectRatio="none">
+                <polyline fill="none" stroke="#5b34d6" stroke-width="2" points="0,20 15,18 30,19 45,12 60,14 75,8 90,10 105,5 120,6"/>
+              </svg>
+            </div></div>
+
+            <div class="card"><div class="card-body">
+              <div class="text-secondary small text-truncate">South · Revenue</div>
+              <div class="fs-4 fw-semibold">$1.12M</div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height:6px"><div class="progress-bar bg-warning" style="width:82%"></div></div>
+                <span class="small text-secondary">82%</span>
+              </div>
+              <svg class="spark mt-2" viewBox="0 0 120 26" width="100%" height="26" preserveAspectRatio="none">
+                <polyline fill="none" stroke="#5b34d6" stroke-width="2" points="0,8 15,10 30,9 45,14 60,12 75,16 90,15 105,18 120,17"/>
+              </svg>
+            </div></div>
+
+            <div class="card"><div class="card-body">
+              <div class="text-secondary small text-truncate">EMEA · Revenue</div>
+              <div class="fs-4 fw-semibold">$2.36M</div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height:6px"><div class="progress-bar bg-success" style="width:113%"></div></div>
+                <span class="small text-secondary">113%</span>
+              </div>
+              <svg class="spark mt-2" viewBox="0 0 120 26" width="100%" height="26" preserveAspectRatio="none">
+                <polyline fill="none" stroke="#5b34d6" stroke-width="2" points="0,22 15,20 30,16 45,17 60,11 75,12 90,7 105,9 120,4"/>
+              </svg>
+            </div></div>
+
+            <div class="card"><div class="card-body">
+              <div class="text-secondary small text-truncate">APAC · Revenue</div>
+              <div class="fs-4 fw-semibold">$0.94M</div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height:6px"><div class="progress-bar bg-danger" style="width:71%"></div></div>
+                <span class="small text-secondary">71%</span>
+              </div>
+              <svg class="spark mt-2" viewBox="0 0 120 26" width="100%" height="26" preserveAspectRatio="none">
+                <polyline fill="none" stroke="#5b34d6" stroke-width="2" points="0,6 15,7 30,9 45,8 60,13 75,12 90,17 105,16 120,20"/>
+              </svg>
+            </div></div>
+
+          </div>
+
+          <hr class="my-3">
+
+          <div class="hf">
+            <div class="d-flex align-items-center gap-2 py-1">
+              <span class="flex-grow-1 text-truncate small">Enterprise · new logos</span>
+              <svg viewBox="0 0 90 22" width="90" height="22"><polyline fill="none" stroke="#8a4bff" stroke-width="2" points="0,16 12,14 24,15 36,9 48,11 60,6 72,8 84,3"/></svg>
+              <span class="fw-semibold small">128</span>
+              <span class="badge text-bg-success">+14.2%</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 py-1">
+              <span class="flex-grow-1 text-truncate small">Mid-market · new logos</span>
+              <svg viewBox="0 0 90 22" width="90" height="22"><polyline fill="none" stroke="#8a4bff" stroke-width="2" points="0,6 12,8 24,7 36,12 48,10 60,14 72,13 84,17"/></svg>
+              <span class="fw-semibold small">341</span>
+              <span class="badge text-bg-danger">-3.1%</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 py-1">
+              <span class="flex-grow-1 text-truncate small">SMB · new logos</span>
+              <svg viewBox="0 0 90 22" width="90" height="22"><polyline fill="none" stroke="#8a4bff" stroke-width="2" points="0,14 12,12 24,13 36,10 48,9 60,7 72,8 84,5"/></svg>
+              <span class="fw-semibold small">1,204</span>
+              <span class="badge text-bg-success">+8.7%</span>
+            </div>
+          </div>
+
+          <div class="alert alert-warning d-flex gap-2 py-2 mb-2 mt-3">
+            <i class="bi bi-exclamation-triangle fs-5"></i>
+            <div><div class="fw-semibold">APAC below plan</div><div class="small">71% of target with 3 weeks left in the quarter — pipeline coverage is 1.4x.</div></div>
+          </div>
+
+          <div class="hf">
+            <div class="d-flex gap-2 pb-2">
+              <div class="text-secondary small" style="min-width:70px">Aug 12</div>
+              <div class="border-start border-2 ps-2"><div class="fw-semibold small">EMEA renewal booked</div><div class="small text-secondary">$420K multi-year, 3 months early</div></div>
+            </div>
+            <div class="d-flex gap-2 pb-2">
+              <div class="text-secondary small" style="min-width:70px">Aug 28</div>
+              <div class="border-start border-2 ps-2"><div class="fw-semibold small">North crossed 100% attainment</div><div class="small text-secondary">first region to clear target this quarter</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="cap">Revenue by quarter</div>
+        <div class="bd"><div class="minibars"><i style="height:42%"></i><i style="height:55%"></i><i style="height:48%"></i><i style="height:70%"></i><i style="height:63%"></i><i style="height:88%"></i></div></div>
+      </div>
+
+      <div class="tile">
+        <div class="cap">Attainment</div>
+        <div class="bd d-flex align-items-center justify-content-center">
+          <div class="text-center">
+            <div class="display-6 fw-semibold" style="color:#5b34d6">94.8%</div>
+            <div class="small text-secondary">of annual target</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="pbi-filters">
+      <h4>Filters</h4>
+      <div class="f"><div class="n">Fiscal year</div><div class="v">FY2026</div></div>
+      <div class="f"><div class="n">Segment</div><div class="v">All</div></div>
+      <div class="f"><div class="n">Region</div><div class="v">North, South, EMEA, APAC</div></div>
+      <div class="f"><div class="n">Product line</div><div class="v">is not blank</div></div>
+    </div>
+  </div>
+</div>
