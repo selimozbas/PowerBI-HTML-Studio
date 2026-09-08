@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 — unreleased
+## 0.1.0 — 2026-09-08
 
 First public version. Renders column/measure values as HTML and SVG on the
 report canvas with:
