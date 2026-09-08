@@ -15,13 +15,15 @@
  *   {{{ path.to.value }}}          raw output
  *   {{ helper(a, b) }}            helper call (nesting allowed)
  *   {{ a > b }}                   comparison => "true" / ""
+ *   {{ !expr }}                   logical NOT
  *   {{#if expr}} ... {{else}} ... {{/if}}
  *   {{#unless expr}} ... {{/unless}}
  *   {{#each items}} ... {{this}} {{@index}} ... {{/each}}
  *   {{> partialName key=expr key2=expr}}   render a named partial
  *
- * Paths resolve against a context stack; `this`, `@index`, `@first`,
- * `@last`, `@key` are available inside {{#each}}.
+ * Paths resolve against a context stack; inside {{#each}} the loop
+ * provides `this`, `@index`, `@first`, `@last` and `@key` - these always
+ * win over a same-named field on the item.
  */
 
 export type Helper = (...args: unknown[]) => unknown;
@@ -92,6 +94,9 @@ function parse(input: string): Node[] {
             if (stopper && (tag === stopper || tag === "else")) {
                 return out;
             }
+            if (tag === "else") {
+                throw new Error("{{else}} outside a block");
+            }
             if (tag.charAt(0) === "#") {
                 const sp = tag.indexOf(" ");
                 const kw = (sp === -1 ? tag.slice(1) : tag.slice(1, sp)) as "if" | "unless" | "each";
@@ -132,33 +137,40 @@ function parse(input: string): Node[] {
     return ast;
 }
 
-function parsePartial(body: string): Extract<Node, { t: "partial" }> {
-    const spaceMatch = body.match(/^(\S+)\s*([^]*)$/);
-    const name = spaceMatch ? spaceMatch[1] : body;
-    const rest = spaceMatch ? spaceMatch[2] : "";
-    const params: Array<[string, string]> = [];
-    // split "key=expr key2=expr" on top-level whitespace
+/** Split on top-level whitespace, keeping quoted strings and `(...)` intact. */
+function splitTokens(src: string): string[] {
+    const toks: string[] = [];
     let depth = 0;
     let quote = "";
     let buf = "";
-    const flush = (): void => {
-        const eq = buf.indexOf("=");
-        if (eq > 0) params.push([buf.slice(0, eq).trim(), buf.slice(eq + 1).trim()]);
-        buf = "";
-    };
-    for (const ch of rest) {
+    for (const ch of src) {
         if (quote) {
             buf += ch;
             if (ch === quote) quote = "";
-        } else if (ch === "'" || ch === '"') {
-            quote = ch;
-            buf += ch;
-        } else if (ch === "(") { depth++; buf += ch; }
+        } else if (ch === "'" || ch === '"') { quote = ch; buf += ch; }
+        else if (ch === "(") { depth++; buf += ch; }
         else if (ch === ")") { depth--; buf += ch; }
-        else if (/\s/.test(ch) && depth === 0) { if (buf.trim()) flush(); }
+        else if (/\s/.test(ch) && depth === 0) { if (buf) { toks.push(buf); buf = ""; } }
         else buf += ch;
     }
-    if (buf.trim()) flush();
+    if (buf) toks.push(buf);
+    return toks;
+}
+
+function parsePartial(body: string): Extract<Node, { t: "partial" }> {
+    const spaceMatch = body.match(/^(\S+)\s*([^]*)$/);
+    const name = spaceMatch ? spaceMatch[1] : body;
+    const toks = splitTokens(spaceMatch ? spaceMatch[2] : "");
+    const params: Array<[string, string]> = [];
+
+    // reassemble `key = value` even when spaces surround the `=` (up to 3 tokens)
+    for (let idx = 0; idx < toks.length; ) {
+        let t = toks[idx++];
+        if (t.indexOf("=") === -1 && toks[idx] === "=") t += toks[idx++];
+        if (/=$/.test(t) && idx < toks.length) t += toks[idx++];
+        const eq = t.indexOf("=");
+        if (eq > 0) params.push([t.slice(0, eq).trim(), t.slice(eq + 1).trim()]);
+    }
     return { t: "partial", name, params };
 }
 
@@ -221,13 +233,17 @@ function renderBlock(n: Extract<Node, { t: "block" }>, ctx: Ctx): string {
         const list = toArray(val);
         if (!list.length) return renderNodes(n.alt, ctx);
         let out = "";
+        const keys = Array.isArray(val) ? null : Object.keys(val as Record<string, unknown>);
         list.forEach((item, index) => {
+            // item fields first, then the loop specials - so `{{@index}}` is the
+            // loop position even if the row object carries an `@index` field.
             ctx.stack.push({
+                ...(item && typeof item === "object" ? (item as object) : {}),
                 "this": item,
                 "@index": index,
                 "@first": index === 0,
                 "@last": index === list.length - 1,
-                ...(item && typeof item === "object" ? (item as object) : {})
+                "@key": keys ? keys[index] : index
             });
             out += renderNodes(n.body, ctx);
             ctx.stack.pop();
@@ -253,6 +269,10 @@ function resolveExpr(expr: string, ctx: Ctx): unknown {
 
 function interpret(expr: string, ctx: Ctx): unknown {
     if (!expr) return "";
+
+    if (expr[0] === "!" && expr[1] !== "=") {
+        return !isTruthy(interpret(expr.slice(1).trim(), ctx));
+    }
 
     for (const op of CMP) {
         const idx = topLevelIndexOf(expr, op);

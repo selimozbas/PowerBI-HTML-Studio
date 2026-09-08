@@ -56,8 +56,10 @@ export function renderContent(input: RenderInput): RenderOutput {
         : [];
 
     const fieldKeys = model.fieldNames;
-    const colorKey = fieldKeys.find((k) => /colou?r\s*$/i.test(k) && !/back/i.test(k));
-    const bgKey = fieldKeys.find((k) => /(background|bg|fill)\s*$/i.test(k));
+    // last word of a field name, splitting on space / _ / - / camelCase
+    const lastWord = (k: string) => (k.trim().split(/[\s_-]+|(?<=[a-z])(?=[A-Z])/).pop() || "").toLowerCase();
+    const colorKey = fieldKeys.find((k) => lastWord(k) === "color" || lastWord(k) === "colour");
+    const bgKey = fieldKeys.find((k) => ["background", "bg"].indexOf(lastWord(k)) !== -1);
 
     const rowView = (row: ForgeRow): Record<string, unknown> => {
         const cf = rules.length ? evaluateRules(rules, row.fields as Record<string, unknown>) : { style: "", classes: [] };
@@ -78,7 +80,7 @@ export function renderContent(input: RenderInput): RenderOutput {
             return { html: out.map((o) => o.html).join("") + moreNote, errors, rowMapped: true, rows: out };
         }
         const sep = input.separator || "";
-        const html = md(rows.map((r) => r.content).join(sep));
+        const html = md(rows.map((r) => r.content).join(sep)) + moreNote;
         return { html, errors, rowMapped: false };
     }
 

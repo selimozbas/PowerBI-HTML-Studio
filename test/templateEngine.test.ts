@@ -41,4 +41,27 @@ describe("renderTemplate", () => {
         expect(r.html).toContain("<svg");
         expect(r.html).toContain("width=\"50.0\"");
     });
+
+    it("@index is the loop position even when the row has an @index field (M1)", () => {
+        const rows = [{ "@index": 5, v: "a" }, { "@index": 2, v: "b" }];
+        const r = renderTemplate("{{#each rows}}{{@index}}:{{v}} {{/each}}", { rows });
+        expect(r.html.trim()).toBe("0:a 1:b");
+    });
+
+    it("@key is available when iterating an object (M2)", () => {
+        const r = renderTemplate("{{#each o}}{{@key}}={{this}} {{/each}}", { o: { a: 1, b: 2 } });
+        expect(r.html.trim()).toBe("a=1 b=2");
+    });
+
+    it("partial params tolerate spaces around = (M3)", () => {
+        const r = renderTemplate('{{> p a = x  b=y}}', { x: "1", y: "2" }, H, { p: "{{a}}-{{b}}" });
+        expect(r.errors).toEqual([]);
+        expect(r.html).toBe("1-2");
+    });
+
+    it("supports unary ! and flags stray {{else}}", () => {
+        expect(renderTemplate("{{#if !ok}}no{{/if}}", { ok: false }).html).toBe("no");
+        const bad = renderTemplate("a {{else}} b", {});
+        expect(bad.errors.length).toBeGreaterThan(0);
+    });
 });
