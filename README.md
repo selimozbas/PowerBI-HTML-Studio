@@ -1,108 +1,188 @@
+<div align="center">
+
 # HTML Studio
 
-**A Power BI custom visual that renders your data as HTML and SVG on the report
-canvas** — with a real templating engine, a component library, interactive
-charts, Bootstrap 5 and a built-in Monaco editor.
+### Design your Power BI report content in HTML — and stop building it with DAX.
 
-It is a modern take on the classic *HTML Viewer* / *HTML Content* visuals: the
-same "just show my HTML" idea, but you rarely have to build that HTML with DAX
-string concatenation any more. You bind a few fields, write a small template,
-and HTML Studio turns each row into markup — cards, tables, KPI tiles, badges,
-timelines, charts — using the report theme, and wires up cross-filtering,
-tooltips and links for you.
+[![build](https://github.com/selimozbas/PowerBI-HTML-Studio/actions/workflows/build.yml/badge.svg)](https://github.com/selimozbas/PowerBI-HTML-Studio/actions/workflows/build.yml)
+[![release](https://img.shields.io/github/v/release/selimozbas/PowerBI-HTML-Studio?sort=semver)](https://github.com/selimozbas/PowerBI-HTML-Studio/releases)
+[![license](https://img.shields.io/github/license/selimozbas/PowerBI-HTML-Studio)](LICENSE)
 
-> MIT licensed. Not affiliated with or endorsed by Microsoft.
+![HTML Studio rendering a KPI dashboard from a template](docs/assets/hero.svg)
+
+</div>
+
+HTML Studio is a Power BI custom visual that turns your data into **HTML and SVG**
+on the report canvas. It's the "just show my HTML" idea from the classic
+*HTML Viewer* / *HTML Content* visuals — but with a **templating engine**, a
+**component library**, **interactive charts**, **Bootstrap 5**, and a
+**Monaco editor built into the visual**. You bind a few fields, write a small
+template, and get cards, tables, scorecards, timelines and charts — themed,
+cross-filtering and export-ready.
 
 ---
 
-## What you can build
+## Why HTML Studio
 
-- **Data-driven layouts** — one HTML block for the whole result, or one per row
-  (`{{#each rows}}` … `{{/each}}`), with `{{Field}}` placeholders, `{{#if}}`
-  conditions and helpers.
-- **KPI tiles / scorecards** without measures-as-text: `{{> kpi label=Product
-  value=Actual target=Target}}` from the built-in component library.
-- **Interactive charts** inside your HTML: `<div data-hf-chart='{"type":"line",
-  "x":"Month","y":["Actual","Target"]}'></div>` → a real uPlot canvas.
-- **A custom HTML slicer** — build a nav / button bar / tree in HTML and have it
-  filter the rest of the report (`data-hf-filter="Region:North"`).
-- **A checklist / sign-off panel** whose ticks are remembered with the report
-  (`data-hf-state="…"`).
-- **Markdown** content, **conditional formatting** by JSON rules or colour
-  scales, **Bootstrap 5** components (`data-bs-toggle="collapse"` …),
-  **Google Fonts** / `@font-face`, **RTL**, and locale-aware number / date
-  formatting.
+The old HTML visuals give you one text box: whatever string your column or
+measure produces gets rendered. In practice that means building HTML **inside
+DAX** — nested `"<div style=""" & ...` that nobody wants to maintain.
 
-## Quick start (report authors)
+HTML Studio flips it around. Your fields stay as fields. You write the markup
+**once**, as a template, and the visual fills it in per row:
 
-1. Add the visual to a report (Power BI Desktop: **Get more visuals → Import a
-   visual from a file** and pick the `.pbiviz` from
-   [Releases](https://github.com/selimozbas/PowerBI-HTML-Studio/releases)).
-2. Drop a column or measure onto the **Content** field well. If its value is
-   already HTML, you'll see it rendered.
-3. To build markup from data, open the **Format** pane → **Content** → set
-   **Content source** to **Template**, and (in report edit mode) click the
-   **✎ Template** button on the visual to open the editor.
-4. A minimal per-row template:
+```handlebars
+{{#each rows}}
+  <div class="card mb-2"><div class="card-body">
+    <div class="d-flex justify-content-between">
+      <b>{{content}}</b>
+      {{> deltaBadge value=Actual base=Target}}
+    </div>
+    {{{bar(Actual, Target)}}}
+    <small class="text-secondary">{{percent(pctOfTotal(Actual, rows, "Actual"), 1)}} of total</small>
+  </div></div>
+{{/each}}
+```
 
-   ```handlebars
-   {{#each rows}}
-     <div class="card mb-2"><div class="card-body">
-       <h6>{{content}}</h6>
-       <div class="fs-4">{{number(Actual)}}</div>
-       <div>{{{bar(Actual, Target)}}} {{percent(pct(Actual, Target), 0)}} of target</div>
-     </div></div>
-   {{/each}}
-   ```
+No string concatenation, no `FORMAT()` gymnastics, no CDN.
 
-   Bind **Content** to the product name and add `Actual` / `Target` measures to
-   the **Data (named fields)** well so `{{Actual}}` / `{{Target}}` resolve.
+---
+
+## Highlights
+
+### 📝 A real templating language
+
+`{{Field}}` interpolation, `{{#if a > b}}` / `{{#each rows}}` / `{{#unless}}`
+blocks, and **35+ helpers** — `format`, `number`, `percent`, `currency`, `date`
+(locale-aware), plus `sum` / `avg` / `top` / `where` / `sortBy` / `rank` /
+`pctOfTotal` / `groupBy` so you can build **subtotals, top-N lists,
+leaderboards and grouped sections without DAX**. It's an AST interpreter — no
+`eval`, no dynamic code — so it's sandbox- and certification-safe.
+→ [Templating](docs/templating.md) · [Helpers](docs/helpers.md)
+
+### 🧩 A component library
+
+`{{> kpi label=Region value=Actual target=Target}}` — 14 ready components
+(`kpi`, `trend`, `gauge`, `sparkRow`, `pill`, `ratingStars`, `timelineItem`,
+`comparison`, `calloutCard`, …). Compose them, or define your own with
+`@partial name`.
+→ [Components](docs/components.md)
+
+### 📊 Real interactive charts, inside your HTML
+
+```html
+<div data-hf-chart='{"type":"area","x":"Month","y":["Actual","Target"]}'></div>
+```
+
+A [uPlot](https://github.com/leeoniya/uPlot) canvas chart — line / spline /
+area / bar — driven by your bound rows, resized with the visual, and rendered
+faithfully in **Export to PDF / PowerPoint**. Plus `{{qr(url)}}` for inline QR
+codes.
+→ [Charts](docs/charts.md)
+
+### 🎛️ It's also a slicer. And a checklist.
+
+- `data-hf-select="Region:North"` — click to **cross-highlight** the report.
+- `data-hf-filter="Region:North"` — click to **filter** every other visual
+  (build your own HTML nav / button bar / tree slicer).
+- `data-hf-state="signoff.legal"` on a checkbox — the tick is **remembered
+  with the report** (a shared checklist / sign-off panel).
+
+→ [Interactivity](docs/interactivity.md)
+
+### 🎨 Themes, presets, fonts — and Bootstrap 5
+
+- The active **report theme** is exposed as CSS variables
+  (`--hf-accent`, `--hf-foreground`, …); SVG helpers and components use them,
+  so everything matches.
+- One-click **style presets**: Cards · Minimal · Dark · Newspaper · Accent tiles.
+- **Google Fonts** (`@import`) or self-hosted `@font-face`, plus **RTL** and
+  locale-aware number / date formatting.
+- **Bootstrap 5** CSS **and** ~2,000 **Bootstrap Icons** are bundled (webfont
+  inlined — no CDN). `data-bs-toggle="collapse"`, `data-bs-toggle="tab"`,
+  carousels, tooltips, toasts all work.
+
+→ [Styling](docs/styling.md)
+
+### 🧑‍💻 A real editor, built in
+
+In report edit mode, the **✎ Template** button opens a **Monaco** editor
+(the VS Code engine) right inside the visual:
+
+- `{{ }}` / HTML syntax highlighting
+- autocomplete for **your field names**, every **helper** and every **component**
+- a **starter-template gallery** (KPI cards, chart card, component dashboard, …)
+- a **live preview** built from a sample of your rows, and a **Data** tab
+- inline **lint markers** for unbalanced blocks and unknown helpers
+
+### 🔒 Safe and self-contained
+
+Author HTML goes through **DOMPurify** before it touches the DOM (policy
+presets: Standard / Strict / Trusted / Custom). Bootstrap, its icon font,
+uPlot, the QR generator and Monaco are **all bundled** — nothing is fetched at
+runtime, so the visual works **offline** and in **export**.
+→ [Security & limitations](docs/security-and-limitations.md)
+
+### 🌍 Localised & export-ready
+
+UI in **English and Turkish**, RTL support, and an **Optimize for export /
+print** mode that expands virtualized rows and drops chrome for a clean PDF.
+Large results are **windowed** automatically past 250 rows.
+
+---
+
+## HTML Studio vs. the classic HTML visuals
+
+| | Classic *HTML Content / Viewer* | **HTML Studio** |
+| --- | :---: | :---: |
+| Render column / measure as HTML & SVG | ✅ | ✅ |
+| `http(s)` links, cross-filter, context menu | ✅ | ✅ |
+| **Templating** (`{{#each}}`, `{{#if}}`, helpers) | — | ✅ |
+| **Named data fields** (`{{Revenue}}`) | — | ✅ up to 20 |
+| **Component library** & user partials | — | ✅ |
+| **Interactive charts** in-content | — | ✅ (uPlot) |
+| **HTML slicer** mode (`applyJsonFilter`) | — | ✅ |
+| **Viewer write-back** (checklists) | — | ✅ |
+| **Bootstrap 5 + icon font** bundled | — | ✅ |
+| **Monaco editor** in the visual | — | ✅ |
+| Conditional formatting rules / colour scales | — | ✅ |
+| Style presets · Google Fonts · RTL · l10n | — | ✅ |
+| Works offline / in export (no CDN) | partial | ✅ |
+
+---
+
+## Quick start
+
+1. **Install** — download the latest `.pbiviz` from
+   [Releases](https://github.com/selimozbas/PowerBI-HTML-Studio/releases), then
+   Power BI Desktop → **Insert → More visuals → Import a visual from a file**.
+2. **Bind data** — put a column/measure on **Content**; add more measures to
+   **Data (named fields)** to reference them as `{{Name}}`.
+3. **Go template** — Format pane → **Content → Content source → Template**, then
+   click **✎ Template** on the visual (in edit mode) and start from a gallery
+   sample.
+
+Full walkthrough: [docs/getting-started.md](docs/getting-started.md).
 
 ## Documentation
 
-Full guide in [**`docs/`**](docs/README.md):
+[**`docs/`**](docs/README.md) — getting started · templating · helpers ·
+components · `data-*` attributes · charts · conditional formatting ·
+interactivity · styling · settings reference · security & limitations ·
+development.
 
-| | |
-| --- | --- |
-| [Getting started](docs/getting-started.md) | Install, field wells, content sources, the editor |
-| [Templating](docs/templating.md) | The `{{ }}` language: interpolation, blocks, `{{#each}}`, partials, context |
-| [Helpers](docs/helpers.md) | Every `{{ helper(...) }}` — formatting, aggregation, charts, QR, colour |
-| [Components](docs/components.md) | The `{{> name}}` component library and how to add your own |
-| [`data-*` attributes](docs/data-attributes.md) | All `data-hf-*` / `data-bs-*` hooks in one table |
-| [Charts](docs/charts.md) | The `data-hf-chart` spec in detail |
-| [Conditional formatting](docs/conditional-formatting.md) | JSON rules, colour scales, DAX colour measures |
-| [Interactivity](docs/interactivity.md) | Cross-filter, HTML slicer, write-back, tooltips, components |
-| [Styling](docs/styling.md) | Theme variables, presets, custom CSS, fonts, Bootstrap, RTL |
-| [Settings reference](docs/settings.md) | Every formatting card and option |
-| [Security & limitations](docs/security-and-limitations.md) | Sanitisation, the Power BI sandbox, what isn't possible |
-| [Development](docs/development.md) | Build from source, project layout, tests, CI, releasing |
-
-## Develop
+## Build from source
 
 ```bash
-npm install        # also runs scripts/embed-bootstrap.mjs (prepare)
+npm install        # also generates the vendored Bootstrap CSS (prepare)
 npm start          # pbiviz start — live in Power BI Desktop / Service
-npm test           # vitest — pure module tests
-npm run lint       # eslint + eslint-plugin-powerbi-visuals
-npm run typecheck  # strict TypeScript
-npm run package    # produces dist/*.pbiviz
+npm test           # vitest
+npm run package    # dist/*.pbiviz
 ```
 
-`pbiviz start` needs the developer certificate once: `pbiviz --install-cert`.
-See [docs/development.md](docs/development.md).
-
-## Design principles
-
-- **No dynamic code generation.** The template engine parses to an AST and
-  interprets it — no `eval`, no `new Function` — so the visual runs inside the
-  Power BI sandbox and stays certification-friendly.
-- **Everything is bundled.** Bootstrap, its icon font, uPlot, the QR generator
-  and Monaco all ship inside the `.pbiviz`; nothing is fetched from a CDN, so
-  it works offline and in **Export to PDF / PowerPoint**.
-- **Sanitised by default.** Author HTML goes through DOMPurify before it
-  touches the DOM; inline `<script>` is only kept behind an explicit toggle
-  (and the sandbox blocks external scripts regardless).
+See [docs/development.md](docs/development.md) for the project layout, the
+two-`tsconfig` setup, and the release flow.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) · Not affiliated with or endorsed by Microsoft.

@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 404" font-family="'Segoe UI',system-ui,-apple-system,sans-serif">
+  <defs>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#118DFF" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#118DFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="1104" height="388" rx="14" fill="#ffffff" stroke="#E1DFDD"/>
+
+  <!-- header -->
+  <path d="M34 40 l7 -8 5 5 8 -12 5 4" fill="none" stroke="#118DFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="62" y="43" font-size="17" font-weight="700" fill="#252423">Regional performance — Q3</text>
+  <text x="1086" y="42" font-size="12" fill="#8A8886" text-anchor="end">rendered by HTML Studio from a template</text>
+
+  <!-- KPI cards -->
+  <g>
+    <!-- North -->
+    <rect x="32" y="60" width="258" height="74" rx="8" fill="#fff" stroke="#E1DFDD"/>
+    <text x="46" y="82" font-size="11" fill="#605E5C">North</text>
+    <text x="46" y="106" font-size="22" font-weight="700" fill="#252423">$1,284k</text>
+    <rect x="46" y="116" width="196" height="6" rx="3" fill="#E1DFDD"/>
+    <rect x="46" y="116" width="196" height="6" rx="3" fill="#1a7f37"/>
+    <text x="276" y="121" font-size="11" fill="#605E5C" text-anchor="end">107%</text>
+
+    <!-- South -->
+    <rect x="302" y="60" width="258" height="74" rx="8" fill="#fff" stroke="#E1DFDD"/>
+    <text x="316" y="82" font-size="11" fill="#605E5C">South</text>
+    <text x="316" y="106" font-size="22" font-weight="700" fill="#252423">$903k</text>
+    <rect x="316" y="116" width="196" height="6" rx="3" fill="#E1DFDD"/>
+    <rect x="316" y="116" width="161" height="6" rx="3" fill="#E8A400"/>
+    <text x="546" y="121" font-size="11" fill="#605E5C" text-anchor="end">82%</text>
+
+    <!-- East -->
+    <rect x="572" y="60" width="258" height="74" rx="8" fill="#fff" stroke="#E1DFDD"/>
+    <text x="586" y="82" font-size="11" fill="#605E5C">East</text>
+    <text x="586" y="106" font-size="22" font-weight="700" fill="#252423">$1,041k</text>
+    <rect x="586" y="116" width="196" height="6" rx="3" fill="#E1DFDD"/>
+    <rect x="586" y="116" width="196" height="6" rx="3" fill="#1a7f37"/>
+    <text x="816" y="121" font-size="11" fill="#605E5C" text-anchor="end">101%</text>
+
+    <!-- West -->
+    <rect x="842" y="60" width="246" height="74" rx="8" fill="#fff" stroke="#E1DFDD"/>
+    <text x="856" y="82" font-size="11" fill="#605E5C">West</text>
+    <text x="856" y="106" font-size="22" font-weight="700" fill="#252423">$612k</text>
+    <rect x="856" y="116" width="184" height="6" rx="3" fill="#E1DFDD"/>
+    <rect x="856" y="116" width="107" height="6" rx="3" fill="#cf222e"/>
+    <text x="1074" y="121" font-size="11" fill="#605E5C" text-anchor="end">58%</text>
+  </g>
+
+  <!-- trend card -->
+  <rect x="32" y="148" width="612" height="232" rx="8" fill="#fff" stroke="#E1DFDD"/>
+  <text x="52" y="176" font-size="12" font-weight="700" fill="#252423">Actual vs target — trend</text>
+  <g transform="translate(52,196)">
+    <line x1="0" y1="132" x2="560" y2="132" stroke="#EDEBE9"/>
+    <line x1="0" y1="88" x2="560" y2="88" stroke="#F5F4F3"/>
+    <line x1="0" y1="44" x2="560" y2="44" stroke="#F5F4F3"/>
+    <path d="M0,116 L80,100 L160,106 L240,74 L320,82 L400,46 L480,54 L560,28 L560,132 L0,132 Z" fill="url(#area)"/>
+    <polyline points="0,116 80,100 160,106 240,74 320,82 400,46 480,54 560,28" fill="none" stroke="#118DFF" stroke-width="2.2" stroke-linejoin="round"/>
+    <polyline points="0,104 80,99 160,94 240,89 320,84 400,79 480,74 560,69" fill="none" stroke="#E66C37" stroke-width="2" stroke-dasharray="5 4"/>
+    <circle cx="560" cy="28" r="3.5" fill="#118DFF"/>
+    <rect x="0" y="150" width="10" height="10" rx="2" fill="#118DFF"/>
+    <text x="16" y="159" font-size="11" fill="#605E5C">Actual</text>
+    <line x1="66" y1="155" x2="86" y2="155" stroke="#E66C37" stroke-width="2" stroke-dasharray="5 4"/>
+    <text x="92" y="159" font-size="11" fill="#605E5C">Target</text>
+  </g>
+
+  <!-- status table card -->
+  <rect x="660" y="148" width="428" height="232" rx="8" fill="#fff" stroke="#E1DFDD"/>
+  <text x="682" y="176" font-size="12" font-weight="700" fill="#252423">Account</text>
+  <text x="946" y="176" font-size="12" font-weight="700" fill="#252423">Deal</text>
+  <text x="1000" y="176" font-size="12" font-weight="700" fill="#252423">Status</text>
+  <line x1="676" y1="186" x2="1072" y2="186" stroke="#E1DFDD"/>
+
+  <g font-size="12" fill="#252423">
+    <rect x="668" y="190" width="412" height="40" fill="#EAF7EE"/>
+    <text x="682" y="215">Contoso</text><text x="978" y="215" text-anchor="end">$88k</text>
+    <rect x="1000" y="203" width="46" height="17" rx="8.5" fill="#1a7f37"/><text x="1023" y="215" fill="#fff" font-size="10" text-anchor="middle">Won</text>
+
+    <text x="682" y="255">Fabrikam</text><text x="978" y="255" text-anchor="end">$54k</text>
+    <rect x="1000" y="243" width="50" height="17" rx="8.5" fill="#605E5C"/><text x="1025" y="255" fill="#fff" font-size="10" text-anchor="middle">Open</text>
+
+    <rect x="668" y="270" width="412" height="40" fill="#FDEAEC"/>
+    <text x="682" y="295">Tailspin</text><text x="978" y="295" text-anchor="end">$31k</text>
+    <rect x="1000" y="283" width="44" height="17" rx="8.5" fill="#cf222e"/><text x="1022" y="295" fill="#fff" font-size="10" text-anchor="middle">Late</text>
+
+    <rect x="668" y="310" width="412" height="40" fill="#EAF7EE"/>
+    <text x="682" y="335">Wingtip</text><text x="978" y="335" text-anchor="end">$65k</text>
+    <rect x="1000" y="323" width="46" height="17" rx="8.5" fill="#1a7f37"/><text x="1023" y="335" fill="#fff" font-size="10" text-anchor="middle">Won</text>
+  </g>
+</svg>
