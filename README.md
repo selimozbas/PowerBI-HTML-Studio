@@ -17,6 +17,8 @@ a lot more built in.
 | Content | **Partials + component library** — `{{> kpi label=… value=… target=…}}`; ~15 built-in components (kpi, trend, gauge, sparkRow, pill, ratingStars…), extend/override via the *Partials* setting |
 | Styling | **Rule-based conditional formatting** authored as JSON, applied per row without DAX |
 | Content | **Markdown mode** — GitHub-flavoured, per row or per block, still sanitised |
+| Charts | **Interactive uPlot canvas charts** — `<div data-hf-chart='{"type":"line","x":"Month","y":["Actual","Target"]}'>`; line / spline / area / bar, driven by bound rows or inline data, resized with the visual |
+| Charts | `{{qr(url, size)}}` — inline SVG QR code, no CDN |
 | Interactivity | **Sandbox-safe components** — tabs & accordion via `data-` attributes, state persisted with `persistProperties` |
 | Interactivity | Cross-filter by row **or by field value** (`data-hf-select="Region:North"`), multi-select, dimming, right-click context menu, `http(s)` links via `launchUrl` |
 | Interactivity | Default Power BI **tooltips** for measures in the Tooltips field well |
@@ -45,6 +47,8 @@ per-region) sub-selection, and a bigger template gallery.
 | `data-hf-tabs="id"` + `data-hf-tab="k"` / `data-hf-panel="k"` | tab group |
 | `data-hf-acc="id"` + `data-hf-acc-panel="id"` | accordion section |
 | `data-hf-object="content"` | marks a region sub-selectable for on-object formatting in format mode |
+| `data-hf-chart='{…}'` | renders a uPlot chart into the element (spec: type, x, y[], data, height, legend, colors) |
+| `data-bs-*` | Bootstrap 5 component behaviour |
 
 Template helper `{{{selectAttr("Region", Region)}}}` emits the first one.
 

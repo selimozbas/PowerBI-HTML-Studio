@@ -1,3 +1,4 @@
+import qrcode from "qrcode-generator";
 import { Helper } from "./templateEngine";
 import { formatValue } from "./format";
 import { sparkline, bar, ring, rating } from "./charts";
@@ -34,6 +35,7 @@ export function buildHelpers(locale = "en-US"): Record<string, Helper> {
             const spec = value === undefined ? String(field ?? "") : `${String(field)}:${String(value ?? "")}`;
             return `data-hf-select="${spec.replace(/"/g, "&quot;")}"`;
         },
+        qr: (text, size) => qrSvg(text, num(size, 96)),
         sparkline: (v, w, h) => sparkline(v, num(w, 80), num(h, 20)),
         bar: (v, max, w, h) => bar(Number(v), num(max, 100), num(w, 100), num(h, 10)),
         ring: (v, max, size) => ring(Number(v), num(max, 100), num(size, 36)),
@@ -44,6 +46,21 @@ export function buildHelpers(locale = "en-US"): Record<string, Helper> {
 function num(v: unknown, fallback: number): number {
     const n = Number(v);
     return isNaN(n) || v === undefined || v === "" ? fallback : n;
+}
+
+/** Inline SVG QR code, sized to `px`, no external dependency at render time. */
+function qrSvg(text: unknown, px: number): string {
+    const value = String(text ?? "");
+    if (!value) return "";
+    try {
+        const qr = qrcode(0, "M");
+        qr.addData(value);
+        qr.make();
+        const svg = qr.createSvgTag({ cellSize: 1, margin: 1, scalable: true });
+        return `<span class="hf-qr" style="display:inline-block;width:${px}px;height:${px}px">${svg}</span>`;
+    } catch {
+        return "";
+    }
 }
 
 function toNumber(v: unknown): number | null {

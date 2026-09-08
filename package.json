@@ -27,7 +27,9 @@
     "dompurify": "^3.1.7",
     "marked": "^18.0.12",
     "monaco-editor": "^0.52.2",
-    "powerbi-visuals-api": "~5.11.1"
+    "powerbi-visuals-api": "~5.11.1",
+    "qrcode-generator": "^1.5.2",
+    "uplot": "^1.6.32"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.11",

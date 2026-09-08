@@ -57,6 +57,7 @@ export function sanitizeToFragment(html: string, opts: SanitizeOptions): Sanitiz
             "data-hf-select",
             "data-hf-object",
             "data-hf-object-label",
+            "data-hf-chart",
             "data-hf-tab",
             "data-hf-tabs",
             "data-hf-panel",

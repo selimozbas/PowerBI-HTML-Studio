@@ -36,6 +36,7 @@ import {
 import { getSubSelectionStyles, getSubSelectionShortcuts, HF_OBJECT_MAP } from "./onObject/subSelection";
 import { initBootstrap, disposeBootstrap, injectBootstrapCss, BsDisposable } from "./framework/bootstrapRuntime";
 import { COMPONENT_LIBRARY, parseUserPartials } from "./components/library";
+import { renderCharts, disposeCharts, ChartInstance } from "./framework/canvasCharts";
 
 import DialogAction = powerbi.DialogAction;
 import ViewMode = powerbi.ViewMode;
@@ -67,6 +68,7 @@ export class Visual implements IVisual {
     private detachLinks: (() => void) | null = null;
     private rowWindow: RowWindow | null = null;
     private bsInstances: BsDisposable[] = [];
+    private charts: ChartInstance[] = [];
     private componentState: ComponentState = {};
     private lastModel: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, hasData: false };
     private lastRenderKey = "";
@@ -169,6 +171,8 @@ export class Visual implements IVisual {
         const renderKey = this.computeRenderKey(model);
         if (renderKey === this.lastRenderKey && this.contentEl.childNodes.length > 0) {
             this.rowWindow?.refresh();
+            const w = this.contentEl.clientWidth;
+            this.charts.forEach((c) => c.resize(w));
             return;
         }
         this.lastRenderKey = renderKey;
@@ -231,6 +235,11 @@ export class Visual implements IVisual {
             mountFragment(this.contentEl, sanitized.fragment);
             this.markAuthorObjects();
             this.initFramework();
+            disposeCharts(this.charts);
+            this.charts = renderCharts(
+                this.contentEl,
+                model.rows.map((r) => ({ ...r.fields, content: r.content, "@index": r.index }))
+            );
         }
 
         this.contentEl.setAttribute(
@@ -507,7 +516,9 @@ export class Visual implements IVisual {
         this.detachLinks?.();
         this.rowWindow?.destroy();
         disposeBootstrap(this.bsInstances);
+        disposeCharts(this.charts);
         this.bsInstances = [];
+        this.charts = [];
         this.detachComponents = null;
         this.detachSelection = null;
         this.detachTooltip = null;

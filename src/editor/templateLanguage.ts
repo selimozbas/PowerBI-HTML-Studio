@@ -9,8 +9,8 @@ export const HELPER_NAMES = [
     "add", "sub", "mul", "div", "pct", "round", "json",
     "sum", "avg", "min", "max", "count", "pluck", "first", "last",
     "sortBy", "where", "whereNot", "top", "bottom", "rank", "pctOfTotal", "groupBy",
-    "colorScale", "relativeTime", "duration",
-    "selectAttr", "sparkline", "bar", "ring", "rating"
+    "colorScale", "relativeTime", "duration", "split", "join", "initials",
+    "selectAttr", "qr", "sparkline", "bar", "ring", "rating"
 ];
 
 const BLOCK_KEYWORDS = ["if", "unless", "each", "else"];

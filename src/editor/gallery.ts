@@ -113,6 +113,18 @@ export const TEMPLATE_GALLERY: TemplateSample[] = [
         ].join("\n")
     },
     {
+        id: "chart-card",
+        name: "Chart card",
+        description: "An interactive uPlot line chart driven by the bound rows.",
+        template: [
+            '<div class="card"><div class="card-body">',
+            '  <h6 class="card-title">Actual vs Target</h6>',
+            '  <div data-hf-chart=\'{"type":"line","x":"content","y":["Actual","Target"],"height":180}\'></div>',
+            '  <div class="text-secondary small mt-1">{{count(rows)}} points &middot; total {{number(sum(rows,"Actual"))}}</div>',
+            '</div></div>'
+        ].join("\n")
+    },
+    {
         id: "badge-table",
         name: "Status table",
         description: "Rows with a coloured status pill (pair with Conditional formatting).",
