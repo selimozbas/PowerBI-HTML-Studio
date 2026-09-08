@@ -54,6 +54,12 @@ export class FormStateBinder {
     attach(root: HTMLElement, enabled: boolean, onChange: (state: FormState) => void): () => void {
         if (!enabled) return () => undefined;
 
+        let timer = 0;
+        const flush = (): void => {
+            timer = 0;
+            onChange(this.getState());
+        };
+
         const handler = (ev: Event): void => {
             const el = ev.target as HTMLElement;
             const holder = el?.closest?.("[data-hf-state]") as HTMLElement | null;
@@ -62,12 +68,21 @@ export class FormStateBinder {
             const key = el.getAttribute("data-hf-state") || "";
             if (!key) return;
             this.state[key] = readControl(el);
-            onChange(this.getState());
+            // update the DOM live, but debounce the persist so typing doesn't
+            // fire persistProperties (and a full re-render) on every keystroke.
+            if (ev.type === "input") {
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(flush, 600) as unknown as number;
+            } else {
+                if (timer) { clearTimeout(timer); timer = 0; }
+                onChange(this.getState());
+            }
         };
 
         root.addEventListener("change", handler);
         root.addEventListener("input", handler);
         return () => {
+            if (timer) clearTimeout(timer);
             root.removeEventListener("change", handler);
             root.removeEventListener("input", handler);
         };

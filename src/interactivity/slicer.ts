@@ -75,15 +75,23 @@ export class SlicerBinder {
             }
             const node = (ev.target as HTMLElement)?.closest?.("[data-hf-filter]") as HTMLElement | null;
             if (!node) return;
-            ev.stopPropagation();
             const spec = node.getAttribute("data-hf-filter") || "";
             if (spec === this.active) {
+                // toggle off
+                ev.stopPropagation();
                 this.active = "";
                 this.apply([]);
-            } else {
-                this.active = spec;
-                this.apply(this.buildFilters(spec));
+                this.reflect(root);
+                return;
             }
+            const filters = this.buildFilters(spec);
+            if (!filters.length) {
+                // nothing maps (e.g. a measure) - do NOT clear existing filters
+                return;
+            }
+            ev.stopPropagation();
+            this.active = spec;
+            this.apply(filters);
             this.reflect(root);
         };
 

@@ -23,9 +23,25 @@ export interface ComponentOptions {
     onStateChange: (state: ComponentState) => void;
 }
 
+function setHidden(el: HTMLElement, hidden: boolean): void {
+    el.hidden = hidden;
+    // a class as well, so author / preset CSS like `.card{display:flex}`
+    // can't override the UA `[hidden]` rule
+    el.classList.toggle("hf-hidden", hidden);
+}
+
+/** Give every unnamed <… data-hf-tabs> a unique id so groups don't share state. */
+function nameGroups(root: HTMLElement): void {
+    let n = 0;
+    root.querySelectorAll<HTMLElement>("[data-hf-tabs]").forEach((g) => {
+        if (!g.getAttribute("data-hf-tabs")) g.setAttribute("data-hf-tabs", `_g${n++}`);
+    });
+}
+
 export function activateComponents(root: HTMLElement, opts: ComponentOptions): () => void {
     const state: ComponentState = { ...opts.initialState };
 
+    nameGroups(root);
     applyTabs(root, state);
     applyAccordions(root, state);
 
@@ -35,7 +51,7 @@ export function activateComponents(root: HTMLElement, opts: ComponentOptions): (
 
         if (target.hasAttribute("data-hf-tab")) {
             const group = target.closest("[data-hf-tabs]") as HTMLElement | null;
-            const groupId = group?.getAttribute("data-hf-tabs") || "tabs";
+            const groupId = group?.getAttribute("data-hf-tabs") || "_g0";
             state[`tab:${groupId}`] = target.getAttribute("data-hf-tab") || "";
             applyTabs(root, state);
         } else {
@@ -52,7 +68,7 @@ export function activateComponents(root: HTMLElement, opts: ComponentOptions): (
 
 function applyTabs(root: HTMLElement, state: ComponentState): void {
     root.querySelectorAll<HTMLElement>("[data-hf-tabs]").forEach((group) => {
-        const groupId = group.getAttribute("data-hf-tabs") || "tabs";
+        const groupId = group.getAttribute("data-hf-tabs") || "_g0";
         const buttons = Array.from(group.querySelectorAll<HTMLElement>("[data-hf-tab]"));
         if (!buttons.length) return;
         let active = state[`tab:${groupId}`];
@@ -68,7 +84,7 @@ function applyTabs(root: HTMLElement, state: ComponentState): void {
             b.tabIndex = on ? 0 : -1;
         });
         group.querySelectorAll<HTMLElement>("[data-hf-panel]").forEach((panel) => {
-            panel.hidden = panel.getAttribute("data-hf-panel") !== active;
+            setHidden(panel, panel.getAttribute("data-hf-panel") !== active);
             panel.setAttribute("role", "tabpanel");
         });
     });
@@ -80,7 +96,14 @@ function applyAccordions(root: HTMLElement, state: ComponentState): void {
         const open = state[`acc:${id}`] === "open";
         btn.classList.toggle("hf-open", open);
         btn.setAttribute("aria-expanded", String(open));
-        const panel = root.querySelector<HTMLElement>(`[data-hf-acc-panel="${id}"]`);
-        if (panel) panel.hidden = !open;
+        // scope the panel lookup so duplicate ids in different accordions don't
+        // all resolve to the first match
+        const scope = btn.closest(".hf-accordion") || btn.parentElement || root;
+        const panel = scope.querySelector<HTMLElement>(`[data-hf-acc-panel="${cssEsc(id)}"]`);
+        if (panel) setHidden(panel, !open);
     });
+}
+
+function cssEsc(v: string | null): string {
+    return String(v ?? "").replace(/["\\\]]/g, "\\$&");
 }

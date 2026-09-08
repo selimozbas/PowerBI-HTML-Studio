@@ -48,8 +48,15 @@ export class RowWindow {
 
         this.wrap.appendChild(this.slot);
         opts.scrollEl.replaceChildren(this.wrap);
+        // Attach the listener only after the first render succeeds, so a throw
+        // in renderRange doesn't leave an orphaned listener + DOM on scrollEl.
+        try {
+            this.render();
+        } catch (e) {
+            opts.scrollEl.replaceChildren();
+            throw e;
+        }
         opts.scrollEl.addEventListener("scroll", this.onScroll, { passive: true });
-        this.render();
     }
 
     destroy(): void {
@@ -57,10 +64,11 @@ export class RowWindow {
         this.opts.scrollEl.removeEventListener("scroll", this.onScroll);
     }
 
-    /** Force a re-window, e.g. after a viewport resize. */
+    /** Force a re-window and re-measure row height, e.g. after a resize. */
     refresh(): void {
         this.start = -1;
         this.end = -1;
+        this.measured = false;
         this.render();
     }
 
@@ -85,13 +93,15 @@ export class RowWindow {
 
         if (!this.measured && end > start) {
             const avg = this.slot.scrollHeight / (end - start);
-            this.measured = true;
-            if (avg > 4 && Math.abs(avg - this.rowH) > 3) {
-                this.rowH = avg;
-                this.start = -1;
-                this.end = -1;
-                this.render();
-                return;
+            if (avg > 4) {
+                this.measured = true; // only latch once we got a real measurement
+                if (Math.abs(avg - this.rowH) > 3) {
+                    this.rowH = avg;
+                    this.start = -1;
+                    this.end = -1;
+                    this.render();
+                    return;
+                }
             }
         }
         this.opts.afterRender?.();

@@ -372,9 +372,11 @@ class AccessibilityCard extends Card {
 }
 
 class WritebackCard extends Card {
+    // NB: persistProperties needs report edit rights, so a read-only Service
+    // viewer cannot save here - this is for report authors / editors.
     enabled = new formattingSettings.ToggleSwitch({
         name: "enabled",
-        displayName: "Remember form input (data-hf-state)",
+        displayName: "Remember form input (needs report edit rights)",
         value: false
     });
 
