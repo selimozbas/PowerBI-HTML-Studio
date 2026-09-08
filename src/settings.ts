@@ -280,6 +280,18 @@ class HyperlinksCard extends Card {
 }
 
 class SanitizationCard extends Card {
+    preset = new formattingSettings.ItemDropdown({
+        name: "preset",
+        displayName: "Policy",
+        items: [
+            { value: "standard", displayName: "Standard" },
+            { value: "strict", displayName: "Strict (certified-safe)" },
+            { value: "trusted", displayName: "Trusted" },
+            { value: "custom", displayName: "Custom (use toggles below)" }
+        ],
+        value: { value: "standard", displayName: "Standard" }
+    });
+
     enabled = new formattingSettings.ToggleSwitch({
         name: "enabled",
         displayName: "Sanitize HTML",
@@ -314,10 +326,24 @@ class SanitizationCard extends Card {
 
     name = "sanitization";
     displayName = "Security";
-    slices = [this.enabled, this.allowSvg, this.allowStyleTag, this.extraAllowedTags, this.extraAllowedAttrs];
+    slices = [this.preset, this.enabled, this.allowSvg, this.allowStyleTag, this.extraAllowedTags, this.extraAllowedAttrs];
 }
 
 class ThemeCard extends Card {
+    preset = new formattingSettings.ItemDropdown({
+        name: "preset",
+        displayName: "Style preset",
+        items: [
+            { value: "none", displayName: "None" },
+            { value: "card", displayName: "Cards" },
+            { value: "minimal", displayName: "Minimal" },
+            { value: "dark", displayName: "Dark" },
+            { value: "newspaper", displayName: "Newspaper" },
+            { value: "tile", displayName: "Accent tiles" }
+        ],
+        value: { value: "none", displayName: "None" }
+    });
+
     injectVars = new formattingSettings.ToggleSwitch({
         name: "injectVars",
         displayName: "Expose report theme as CSS variables",
@@ -325,8 +351,8 @@ class ThemeCard extends Card {
     });
 
     name = "theme";
-    displayName = "Report theme";
-    slices = [this.injectVars];
+    displayName = "Appearance";
+    slices = [this.preset, this.injectVars];
 }
 
 class AccessibilityCard extends Card {
@@ -386,9 +412,15 @@ class PerformanceCard extends Card {
         options: { minValue: { value: 0, type: 0 }, maxValue: { value: 30000, type: 1 } }
     });
 
+    printMode = new formattingSettings.ToggleSwitch({
+        name: "printMode",
+        displayName: "Optimize for export / print",
+        value: false
+    });
+
     name = "performance";
     displayName = "Performance";
-    slices = [this.maxRows];
+    slices = [this.maxRows, this.printMode];
 }
 
 class DebugCard extends Card {

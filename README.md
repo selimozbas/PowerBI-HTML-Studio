@@ -15,7 +15,9 @@ a lot more built in.
 | Content | **Named data fields** — drop extra measures in *Data* and reference them as `{{Revenue}}`; no DAX string concatenation |
 | Content | **Aggregation helpers** — `sum` / `avg` / `top` / `where` / `sortBy` / `rank` / `pctOfTotal` / `groupBy` … subtotals, leaderboards and grouped sections without DAX |
 | Content | **Partials + component library** — `{{> kpi label=… value=… target=…}}`; ~15 built-in components (kpi, trend, gauge, sparkRow, pill, ratingStars…), extend/override via the *Partials* setting |
-| Styling | **Rule-based conditional formatting** authored as JSON, applied per row without DAX |
+| Styling | **Rule-based conditional formatting** authored as JSON (comparisons + colour scales), applied per row without DAX; a DAX colour measure surfaces as `{{cfBg}}` / `{{cfColor}}` |
+| Styling | **Style presets** (Cards / Minimal / Dark / Newspaper / Accent tiles) and a **Security policy** preset (Standard / Strict / Trusted / Custom) |
+| Styling | **Export/print mode** — expands virtualized rows, drops chrome, `overflow: visible` for full-fidelity PDF/PowerPoint export |
 | Content | **Markdown mode** — GitHub-flavoured, per row or per block, still sanitised |
 | Charts | **Interactive uPlot canvas charts** — `<div data-hf-chart='{"type":"line","x":"Month","y":["Actual","Target"]}'>`; line / spline / area / bar, driven by bound rows or inline data, resized with the visual |
 | Charts | `{{qr(url, size)}}` — inline SVG QR code, no CDN |
@@ -31,15 +33,15 @@ a lot more built in.
 | Format | **On-object formatting** — in format mode the content region is sub-selectable; the mini-toolbar edits font / bold / italic / underline / colour / background, and `data-hf-object="content"` exposes extra regions |
 | UI kit | **Bootstrap 5 built in** — full CSS + Bootstrap Icons (webfont inlined, no CDN) always available; JS components (collapse, tabs, dropdowns, tooltips, toasts, carousel…) via `data-bs-*`, toggleable. `bootstrap.Modal` is limited to the visual's own rectangle by the Power BI sandbox. |
 | Security | **DOMPurify** sanitisation with a configurable allow-list; inline `<script>` only behind an explicit unsafe toggle |
-| DX | **Advanced editor** (modal dialog): Monaco with `{{ }}` syntax highlighting, field/helper autocomplete, a starter-template gallery and a live preview |
+| DX | **Advanced editor** (modal dialog): Monaco with `{{ }}` syntax highlighting, field/helper/component autocomplete, starter-template gallery, live preview, a bound-**Data** tab and inline lint markers (unbalanced blocks, unknown helpers) |
 | DX | In-visual **diagnostics panel**: template errors, sanitiser removals, available field names |
 
 Open the editor from the **✎ Template** button shown on the visual while the
 report is in edit mode; OK writes the template back through `persistProperties`.
 
-The backlog from the original brief is complete. Remaining ideas are
-polish: direct-edit of text in format mode, per-object (not just
-per-region) sub-selection, and a bigger template gallery.
+Not possible in a table-mapped custom visual: Power BI's native **fx**
+conditional-formatting dialog (Microsoft blocks it for table/matrix
+visuals) and **Highlight** — both deliberate non-goals here.
 
 ### Authoring hooks (data- attributes)
 

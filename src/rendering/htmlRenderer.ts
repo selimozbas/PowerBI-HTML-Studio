@@ -55,6 +55,10 @@ export function renderContent(input: RenderInput): RenderOutput {
         ? [{ message: `Conditional formatting: ${rulesError}`, snippet: input.conditionalFormatting.rulesRaw.slice(0, 80) }]
         : [];
 
+    const fieldKeys = model.fieldNames;
+    const colorKey = fieldKeys.find((k) => /colou?r\s*$/i.test(k) && !/back/i.test(k));
+    const bgKey = fieldKeys.find((k) => /(background|bg|fill)\s*$/i.test(k));
+
     const rowView = (row: ForgeRow): Record<string, unknown> => {
         const cf = rules.length ? evaluateRules(rules, row.fields as Record<string, unknown>) : { style: "", classes: [] };
         return {
@@ -62,7 +66,9 @@ export function renderContent(input: RenderInput): RenderOutput {
             content: row.content,
             "@index": row.index,
             cfStyle: cf.style,
-            cfClass: cf.classes.join(" ")
+            cfClass: cf.classes.join(" "),
+            cfColor: colorKey ? row.fields[colorKey] : "",
+            cfBg: bgKey ? row.fields[bgKey] : ""
         };
     };
 

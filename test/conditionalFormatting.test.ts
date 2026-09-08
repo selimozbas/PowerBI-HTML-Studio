@@ -23,6 +23,22 @@ describe("conditionalFormatting", () => {
         expect(res.classes).toContain("hot");
     });
 
+    it("applies a two-stop colour scale to the background", () => {
+        const { rules } = parseRules(
+            '[{"scale":{"field":"Score","min":0,"max":100,"minColor":"#000000","maxColor":"#ffffff"}}]'
+        );
+        expect(evaluateRules(rules, { Score: 0 }).style).toBe("background-color:#000000");
+        expect(evaluateRules(rules, { Score: 50 }).style).toBe("background-color:#808080");
+        expect(evaluateRules(rules, { Score: 100 }).style).toBe("background-color:#ffffff");
+    });
+
+    it("colour scale can target text and supports a mid stop", () => {
+        const { rules } = parseRules(
+            '[{"scale":{"field":"n","min":0,"mid":50,"max":100,"minColor":"#ff0000","midColor":"#ffffff","maxColor":"#00ff00"},"target":"color"}]'
+        );
+        expect(evaluateRules(rules, { n: 50 }).style).toBe("color:#ffffff");
+    });
+
     it("supports between and contains operators", () => {
         const { rules } = parseRules(
             '[{"field":"n","op":"between","value":1,"value2":5,"style":{"color":"red"}},' +

@@ -17,6 +17,7 @@ import { renderContent } from "./rendering/htmlRenderer";
 import { sanitizeToFragment } from "./rendering/sanitize";
 import { buildThemeVars } from "./theme/themeVars";
 import { buildFontCss } from "./theme/fonts";
+import { THEME_PRESETS, SANITIZE_PRESETS } from "./theme/presets";
 import { activateComponents, ComponentState } from "./rendering/components";
 import { RowWindow } from "./rendering/rowWindow";
 import { SelectionBinder, SelectionOptions } from "./interactivity/selection";
@@ -171,6 +172,9 @@ export class Visual implements IVisual {
             })
             : "";
 
+        const printMode = s.performance.printMode.value;
+        this.root.classList.toggle("hf-print", printMode);
+
         // Style-only / resize updates: refresh the cheap bits and bail out
         // before re-running the template engine + sanitiser.
         this.styleEl.textContent = this.composeCss(themeVars);
@@ -194,7 +198,7 @@ export class Visual implements IVisual {
             rowTemplate: s.content.rowTemplate.value || "",
             separator: this.decodeSeparator(s.content.separator.value),
             noDataMessage: s.content.noDataMessage.value,
-            rowLimit: s.performance.maxRows.value,
+            rowLimit: printMode ? 0 : s.performance.maxRows.value,
             partials: { ...COMPONENT_LIBRARY, ...parseUserPartials(s.content.partials.value) },
             conditionalFormatting: {
                 enabled: s.conditionalFormatting.enabled.value,
@@ -203,10 +207,11 @@ export class Visual implements IVisual {
             locale: this.host.locale || "en-US"
         });
 
+        const sanPreset = SANITIZE_PRESETS[this.enumValue(s.sanitization.preset.value, "standard")];
         const sanOpts = {
-            enabled: s.sanitization.enabled.value,
-            allowSvg: s.sanitization.allowSvg.value,
-            allowStyleTag: s.sanitization.allowStyleTag.value,
+            enabled: sanPreset ? sanPreset.enabled : s.sanitization.enabled.value,
+            allowSvg: sanPreset ? sanPreset.allowSvg : s.sanitization.allowSvg.value,
+            allowStyleTag: sanPreset ? sanPreset.allowStyleTag : s.sanitization.allowStyleTag.value,
             allowScripts: s.content.unsafeAllowScripts.value,
             extraTags: splitList(s.sanitization.extraAllowedTags.value),
             extraAttrs: splitList(s.sanitization.extraAllowedAttrs.value)
@@ -215,7 +220,7 @@ export class Visual implements IVisual {
         this.teardownDynamic();
 
         const rows = rendered.rows;
-        const virtualize = !!rendered.rowMapped && !!rows && rows.length > VIRTUALIZE_THRESHOLD;
+        const virtualize = !printMode && !!rendered.rowMapped && !!rows && rows.length > VIRTUALIZE_THRESHOLD;
         let removed: string[] = [];
 
         if (virtualize && rows) {
@@ -384,7 +389,8 @@ export class Visual implements IVisual {
     private composeCss(themeVars: string): string {
         const s = this.settings;
         const fontCss = buildFontCss(s.fonts.googleFamilies.value, s.fonts.fontFaceCss.value);
-        return `${fontCss}\n.hf-visual{${themeVars}}\n${s.stylesheet.css.value || ""}`;
+        const preset = THEME_PRESETS[this.enumValue(s.theme.preset.value, "none")] || "";
+        return `${fontCss}\n.hf-visual{${themeVars}}\n${preset}\n${s.stylesheet.css.value || ""}`;
     }
 
     private applyWrapperStyles(): void {
@@ -423,6 +429,8 @@ export class Visual implements IVisual {
             ndm: s.content.noDataMessage.value,
             uas: s.content.unsafeAllowScripts.value,
             maxRows: s.performance.maxRows.value,
+            pm: s.performance.printMode.value,
+            sp: s.sanitization.preset.value,
             dbg: s.debug.showPanel.value,
             hl: s.hyperlinks.enabled.value,
             bs: s.bootstrap.enableJs.value,

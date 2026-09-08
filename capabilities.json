@@ -161,6 +161,16 @@
     },
     "sanitization": {
       "properties": {
+        "preset": {
+          "type": {
+            "enumeration": [
+              { "value": "standard", "displayName": "Standard" },
+              { "value": "strict", "displayName": "Strict (certified-safe)" },
+              { "value": "trusted", "displayName": "Trusted" },
+              { "value": "custom", "displayName": "Custom" }
+            ]
+          }
+        },
         "enabled": { "type": { "bool": true } },
         "allowSvg": { "type": { "bool": true } },
         "allowStyleTag": { "type": { "bool": true } },
@@ -170,6 +180,18 @@
     },
     "theme": {
       "properties": {
+        "preset": {
+          "type": {
+            "enumeration": [
+              { "value": "none", "displayName": "None" },
+              { "value": "card", "displayName": "Cards" },
+              { "value": "minimal", "displayName": "Minimal" },
+              { "value": "dark", "displayName": "Dark" },
+              { "value": "newspaper", "displayName": "Newspaper" },
+              { "value": "tile", "displayName": "Accent tiles" }
+            ]
+          }
+        },
         "injectVars": { "type": { "bool": true } }
       }
     },
@@ -200,7 +222,8 @@
     },
     "performance": {
       "properties": {
-        "maxRows": { "type": { "numeric": true } }
+        "maxRows": { "type": { "numeric": true } },
+        "printMode": { "type": { "bool": true } }
       }
     },
     "debug": {

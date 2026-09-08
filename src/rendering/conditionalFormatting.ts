@@ -1,25 +1,45 @@
 /**
  * Rule-based conditional formatting evaluated in the visual (no DAX).
  *
- * Rules are authored as JSON in the formatting pane:
+ * Power BI's native "fx" conditional formatting is unavailable to
+ * table-mapped custom visuals, so rules are authored as JSON here:
+ *
  *   [
  *     { "field": "Revenue", "op": ">", "value": 1000,
  *       "style": { "color": "#0a0", "fontWeight": "bold" }, "class": "hf-good" },
  *     { "field": "Status", "op": "==", "value": "Late",
- *       "style": { "background": "#fde7e9" } }
+ *       "style": { "background": "#fde7e9" } },
+ *     { "scale": { "field": "Score", "min": 0, "max": 100,
+ *                  "minColor": "#fde7e9", "maxColor": "#d1e7dd" }, "target": "bg" }
  *   ]
  *
- * The engine returns an inline `style="..."` string and a list of class
- * names for a given row, which the renderer applies to the row wrapper.
+ * A DAX colour measure dropped in the Data well is simpler still - it is
+ * available in templates as `{{ColourMeasure}}` (and as `{{cfBg}}` /
+ * `{{cfColor}}` when named like "…color" / "…background").
+ *
+ * evaluateRules returns an inline `style` string + class names for a row.
  */
 
+export interface CfScale {
+    field?: string;
+    min: number;
+    mid?: number;
+    max: number;
+    minColor: string;
+    midColor?: string;
+    maxColor: string;
+}
+
 export interface CfRule {
-    field: string;
-    op: ">" | ">=" | "<" | "<=" | "==" | "!=" | "contains" | "between";
-    value: unknown;
+    field?: string;
+    op?: ">" | ">=" | "<" | "<=" | "==" | "!=" | "contains" | "between";
+    value?: unknown;
     value2?: unknown;
     style?: Record<string, string>;
     "class"?: string;
+    /** colour-scale rule; `target` chooses background (default) or text */
+    scale?: CfScale;
+    target?: "bg" | "color";
 }
 
 export interface CfResult { style: string; classes: string[]; }
@@ -52,7 +72,13 @@ export function evaluateRules(rules: CfRule[], row: Record<string, unknown>): Cf
     const classes: string[] = [];
 
     for (const rule of rules) {
-        if (!matches(rule, row[rule.field])) continue;
+        if (rule.scale) {
+            const field = rule.scale.field || rule.field;
+            const color = scaleColor(rule.scale, numericish(field ? row[field] : NaN));
+            if (color) styleObj[rule.target === "color" ? "color" : "background-color"] = color;
+            continue;
+        }
+        if (rule.field === undefined || !matches(rule, row[rule.field])) continue;
         if (rule.class) classes.push(rule.class);
         if (rule.style) {
             for (const k of Object.keys(rule.style)) {
@@ -65,6 +91,32 @@ export function evaluateRules(rules: CfRule[], row: Record<string, unknown>): Cf
         .map((k) => `${k}:${styleObj[k]}`)
         .join(";");
     return { style, classes };
+}
+
+function scaleColor(scale: CfScale, value: number): string {
+    if (isNaN(value)) return "";
+    const clamp = (t: number) => Math.max(0, Math.min(1, t));
+    if (scale.midColor !== undefined && scale.mid !== undefined) {
+        if (value <= scale.mid) {
+            return mix(scale.minColor, scale.midColor, clamp((value - scale.min) / (scale.mid - scale.min || 1)));
+        }
+        return mix(scale.midColor, scale.maxColor, clamp((value - scale.mid) / (scale.max - scale.mid || 1)));
+    }
+    return mix(scale.minColor, scale.maxColor, clamp((value - scale.min) / (scale.max - scale.min || 1)));
+}
+
+function mix(from: string, to: string, t: number): string {
+    const a = hexToRgb(from);
+    const b = hexToRgb(to);
+    const c = (i: number) => Math.round(a[i] + (b[i] - a[i]) * t);
+    return `#${[c(0), c(1), c(2)].map((n) => n.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+    const h = String(hex || "").replace("#", "");
+    const full = h.length === 3 ? h.split("").map((x) => x + x).join("") : h;
+    const n = parseInt(full || "000000", 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
 function matches(rule: CfRule, cell: unknown): boolean {
