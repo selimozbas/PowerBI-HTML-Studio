@@ -79,6 +79,13 @@ scripts/embed-bootstrap.mjs       Bootstrap CSS -> src/framework/bootstrapCss.ts
   `DOMParser`. `eslint-plugin-powerbi-visuals` enforces this.
 - **Everything is bundled.** Bootstrap + its icon font, uPlot, `qrcode-generator`
   and Monaco all ship in the `.pbiviz`; no runtime CDN fetches.
+- **The Monaco editor is bundled, not lazy-loaded.** A pbiviz visual has a
+  single entry bundle — webpack `import()` split points are not served by the
+  sandbox host, so `openTemplateEditor` can't code-split Monaco into a chunk.
+  Monaco (no-worker build) therefore adds ~900 KB gzip to every load whether or
+  not a viewer opens the editor. This is a deliberate trade-off; the alternative
+  (`monaco-editor-core` with the hf-template language reimplemented) was judged
+  not worth the regression risk for a non-certified visual.
 - Bootstrap's minified CSS can't go through the fixed pbiviz `less-loader`
   pipeline, so `scripts/embed-bootstrap.mjs` inlines it (and the icon woff2) into
   a generated TS string injected at runtime.

@@ -135,3 +135,11 @@ as written.
 string (per row, or the whole block) from GitHub-flavoured Markdown to HTML
 before sanitising. Handy when the source is prose or a Markdown measure; combine
 with a template for structure and Markdown for content.
+
+> **Markdown runs on the template's *output*, not just your data.** If a
+> template emits HTML, that HTML is fed back through the Markdown parser: a line
+> that starts with `#` becomes a heading, `*word*` becomes `<em>`, four-space
+> indents become code blocks, and blank lines split `<p>`s. Keep Markdown mode
+> off when your template already produces HTML; turn it on only when the
+> template's job is to assemble Markdown text. In per-row mode the parser runs
+> once per row, so it is also the slower path for large tables.

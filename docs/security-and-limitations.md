@@ -10,9 +10,14 @@ policy:
 | Policy | Sanitise | Inline SVG | `<style>` blocks |
 | --- | --- | --- | --- |
 | **Standard** (default) | yes | yes | yes |
-| Strict (certified-safe) | yes | yes | no |
-| Trusted | yes | yes | yes |
+| Strict (no inline styles) | yes | yes | no |
+| Trusted (no sanitising) | **no** | yes | yes |
 | Custom | your toggles | your toggles | your toggles |
+
+**Trusted** turns DOMPurify off completely — author HTML renders as-is, the way
+the original *html-content* visual worked. Parser-inserted `<script>` still can't
+run, but `<img onerror>` / `<svg onload>` handlers do. Only pick it for reports
+whose template you fully control.
 
 - `data-hf-*` and `data-bs-*` attributes are always allowed. Add more under
   **Extra allowed tags / attributes**.

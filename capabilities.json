@@ -165,8 +165,8 @@
           "type": {
             "enumeration": [
               { "value": "standard", "displayName": "Standard" },
-              { "value": "strict", "displayName": "Strict (certified-safe)" },
-              { "value": "trusted", "displayName": "Trusted" },
+              { "value": "strict", "displayName": "Strict (no inline styles)" },
+              { "value": "trusted", "displayName": "Trusted (no sanitising)" },
               { "value": "custom", "displayName": "Custom" }
             ]
           }

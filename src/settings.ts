@@ -288,8 +288,8 @@ class SanitizationCard extends Card {
         displayName: "Policy",
         items: [
             { value: "standard", displayName: "Standard" },
-            { value: "strict", displayName: "Strict (certified-safe)" },
-            { value: "trusted", displayName: "Trusted" },
+            { value: "strict", displayName: "Strict (no inline styles)" },
+            { value: "trusted", displayName: "Trusted (no sanitising)" },
             { value: "custom", displayName: "Custom (use toggles below)" }
         ],
         value: { value: "standard", displayName: "Standard" }

@@ -12,10 +12,17 @@ describe("presets", () => {
         }
     });
 
-    it("sanitize presets keep sanitisation on; strict drops <style>", () => {
+    it("strict drops <style>; trusted turns sanitising off; each preset differs", () => {
         expect(SANITIZE_PRESETS.custom).toBeNull();
         expect(SANITIZE_PRESETS.strict).toEqual({ enabled: true, allowSvg: true, allowStyleTag: false });
-        expect(SANITIZE_PRESETS.standard?.allowStyleTag).toBe(true);
-        expect(SANITIZE_PRESETS.trusted?.enabled).toBe(true);
+        expect(SANITIZE_PRESETS.standard).toEqual({ enabled: true, allowSvg: true, allowStyleTag: true });
+        expect(SANITIZE_PRESETS.trusted).toEqual({ enabled: false, allowSvg: true, allowStyleTag: true });
+        // no two named presets are identical
+        const seen = new Set(
+            Object.entries(SANITIZE_PRESETS)
+                .filter(([, v]) => v)
+                .map(([, v]) => JSON.stringify(v))
+        );
+        expect(seen.size).toBe(3);
     });
 });

@@ -75,7 +75,7 @@ Custom CSS (text) — injected into the visual.
 
 | Option | Values |
 | --- | --- |
-| Policy | **Standard** / Strict (certified-safe) / Trusted / Custom |
+| Policy | **Standard** / Strict (no inline styles) / Trusted (no sanitising) / Custom |
 | Sanitize HTML | **on** / off *(Custom policy only)* |
 | Allow inline SVG | **on** / off *(Custom)* |
 | Allow `<style>` blocks | **on** / off *(Custom)* |
@@ -83,8 +83,9 @@ Custom CSS (text) — injected into the visual.
 
 A non-Custom policy overrides the three toggles:
 Standard = sanitise + SVG + `<style>`; Strict = sanitise + SVG, no `<style>`;
-Trusted = sanitise + SVG + `<style>`. Full "off" is only reachable via
-**Custom** (or the *Content → Allow inline `<script>`* toggle for scripts).
+Trusted = **no sanitising** (author HTML renders as-is — parser-inserted
+`<script>` still can't run, but inline `onerror` / `onload` handlers do).
+A middle "off" is also reachable via **Custom**.
 
 ## Appearance
 

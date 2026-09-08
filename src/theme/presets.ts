@@ -50,10 +50,15 @@ export interface SanitizePreset {
     allowStyleTag: boolean;
 }
 
-/** `custom` means "use the individual toggles"; anything else overrides them. */
+/**
+ * `custom` means "use the individual toggles"; anything else overrides them.
+ * `trusted` turns the sanitiser off entirely - author HTML renders as-is, like
+ * the original html-content visual. Parser-inserted <script> stays inert, but
+ * `<img onerror>` / `<svg onload>` do run, so it is opt-in only.
+ */
 export const SANITIZE_PRESETS: Record<string, SanitizePreset | null> = {
     custom: null,
     strict: { enabled: true, allowSvg: true, allowStyleTag: false },
     standard: { enabled: true, allowSvg: true, allowStyleTag: true },
-    trusted: { enabled: true, allowSvg: true, allowStyleTag: true }
+    trusted: { enabled: false, allowSvg: true, allowStyleTag: true }
 };
