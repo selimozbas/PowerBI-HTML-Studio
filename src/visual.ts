@@ -18,9 +18,11 @@ import { sanitizeToFragment } from "./rendering/sanitize";
 import { buildThemeVars } from "./theme/themeVars";
 import { activateComponents, ComponentState } from "./rendering/components";
 import { SelectionBinder, SelectionOptions } from "./interactivity/selection";
+import { TooltipBinder } from "./interactivity/tooltip";
 import { renderDebugPanel } from "./ui/debugPanel";
 import { renderLanding } from "./landing/landing";
 import { mountFragment, clearElement } from "./dom/inject";
+import { makeTranslator, Translate } from "./i18n";
 
 export class Visual implements IVisual {
     private host: IVisualHost;
@@ -32,11 +34,14 @@ export class Visual implements IVisual {
     private events: IVisualEventService;
     private selectionManager: ISelectionManager;
     private selectionBinder: SelectionBinder;
+    private tooltipBinder: TooltipBinder;
     private formattingService: FormattingSettingsService;
+    private translate: Translate;
     private settings!: VisualFormattingSettingsModel;
 
     private detachComponents: (() => void) | null = null;
     private detachSelection: (() => void) | null = null;
+    private detachTooltip: (() => void) | null = null;
     private componentState: ComponentState = {};
 
     constructor(options: VisualConstructorOptions) {
@@ -45,6 +50,8 @@ export class Visual implements IVisual {
         this.formattingService = new FormattingSettingsService();
         this.selectionManager = this.host.createSelectionManager();
         this.selectionBinder = new SelectionBinder(this.selectionManager);
+        this.tooltipBinder = new TooltipBinder(this.host.tooltipService);
+        this.translate = makeTranslator(this.host.createLocalizationManager());
 
         this.root = options.element;
         this.root.classList.add("hf-visual");
@@ -80,7 +87,7 @@ export class Visual implements IVisual {
 
             if (!model.hasData && !this.settings.content.noDataMessage.value) {
                 this.teardownDynamic();
-                renderLanding(this.contentEl);
+                renderLanding(this.contentEl, this.translate);
                 this.styleEl.textContent = "";
                 this.debugEl.hidden = true;
             } else {
@@ -106,6 +113,7 @@ export class Visual implements IVisual {
             model,
             contentSource: this.enumValue(s.content.contentSource.value, "value") as "value" | "template",
             renderMode: this.enumValue(s.content.renderMode.value, "aggregate") as "aggregate" | "row",
+            markdown: s.content.renderMarkdown.value,
             bodyTemplate: s.content.bodyTemplate.value || String(s.content.bodyTemplate.placeholder || ""),
             rowTemplate: s.content.rowTemplate.value || "",
             separator: this.decodeSeparator(s.content.separator.value),
@@ -131,13 +139,21 @@ export class Visual implements IVisual {
 
         this.teardownDynamic();
         mountFragment(this.contentEl, sanitized.fragment);
-        this.contentEl.setAttribute("aria-label", s.accessibility.ariaLabel.value || "HTML content");
+        this.contentEl.setAttribute(
+            "aria-label",
+            s.accessibility.ariaLabel.value || this.translate("Aria_Default", "HTML content")
+        );
         this.contentEl.setAttribute("role", "region");
 
         if (s.hyperlinks.enabled.value) this.interceptLinks();
 
+        this.tooltipBinder.setRows(model.rows);
+        this.detachTooltip = this.tooltipBinder.attach(this.contentEl);
+
         this.selectionBinder.setRows(model.rows);
-        this.detachSelection = this.selectionBinder.attach(this.contentEl, this.currentSelectionOptions());
+        if (this.allowInteractions()) {
+            this.detachSelection = this.selectionBinder.attach(this.contentEl, this.currentSelectionOptions());
+        }
 
         if (s.components.enabled.value) {
             this.detachComponents = activateComponents(this.contentEl, {
@@ -152,12 +168,16 @@ export class Visual implements IVisual {
 
         this.debugEl.hidden = !s.debug.showPanel.value;
         if (s.debug.showPanel.value) {
-            renderDebugPanel(this.debugEl, {
-                templateErrors: rendered.errors,
-                removedTags: sanitized.removed,
-                rowCount: model.rows.length,
-                fieldNames: model.fieldNames
-            });
+            renderDebugPanel(
+                this.debugEl,
+                {
+                    templateErrors: rendered.errors,
+                    removedTags: sanitized.removed,
+                    rowCount: model.rows.length,
+                    fieldNames: model.fieldNames
+                },
+                this.translate
+            );
         }
     }
 
@@ -166,6 +186,11 @@ export class Visual implements IVisual {
     }
 
     /* --------------------------- helpers ------------------------------ */
+
+    private allowInteractions(): boolean {
+        const caps = this.host.hostCapabilities as { allowInteractions?: boolean } | undefined;
+        return !caps || caps.allowInteractions !== false;
+    }
 
     private currentSelectionOptions(): SelectionOptions {
         const s = this.settings;
@@ -246,8 +271,10 @@ export class Visual implements IVisual {
     private teardownDynamic(): void {
         this.detachComponents?.();
         this.detachSelection?.();
+        this.detachTooltip?.();
         this.detachComponents = null;
         this.detachSelection = null;
+        this.detachTooltip = null;
         clearElement(this.contentEl);
     }
 }

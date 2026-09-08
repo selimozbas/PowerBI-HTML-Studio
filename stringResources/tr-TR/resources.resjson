@@ -1,0 +1,14 @@
+{
+  "NoData_Default": "Görüntülenecek bir şey yok",
+  "Aria_Default": "HTML içerik",
+  "Landing_Title": "HTML Forge",
+  "Landing_Intro": "HTML veya SVG olarak işlemek için İçerik alanına bir sütun ya da ölçü ekleyin.",
+  "Landing_Tip_Named": "Veri (adlandırılmış alanlar) alanına ölçüler ekleyin ve şablonda {{Ciro}} gibi adıyla kullanın.",
+  "Landing_Tip_Template": "Döngü, koşul ve bar(Gerçekleşen, Hedef) gibi yardımcılar için İçerik › İçerik kaynağı seçeneğini Şablon yapın.",
+  "Landing_Tip_Cf": "DAX olmadan kural tabanlı biçimlendirme için Koşullu biçimlendirme kartını kullanın.",
+  "Debug_Title": "HTML Forge tanılama",
+  "Debug_NoIssues": "Şablon veya temizleme sorunu yok.",
+  "Debug_Rows": "satır",
+  "Debug_Fields": "Alanlar",
+  "Debug_Removed": "Temizlemede kaldırılan"
+}

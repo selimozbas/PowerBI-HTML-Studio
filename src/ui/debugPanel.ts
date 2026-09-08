@@ -1,5 +1,6 @@
 import { TemplateError, escapeHtml } from "../rendering/templateEngine";
 import { mountTrustedHtml } from "../dom/inject";
+import { Translate } from "../i18n";
 
 export interface DebugInfo {
     templateErrors: TemplateError[];
@@ -14,20 +15,20 @@ export interface DebugInfo {
  * field names available to templates - far more detail than a bare
  * "something went wrong".
  */
-export function renderDebugPanel(host: HTMLElement, info: DebugInfo): void {
+export function renderDebugPanel(host: HTMLElement, info: DebugInfo, t: Translate): void {
     const rows: string[] = [];
-    rows.push(`<div class="hf-debug-line"><b>${info.rowCount}</b> row(s)</div>`);
+    rows.push(`<div class="hf-debug-line"><b>${info.rowCount}</b> ${escapeHtml(t("Debug_Rows", "row(s)"))}</div>`);
     if (info.fieldNames.length) {
         rows.push(
-            `<div class="hf-debug-line">Fields: ${info.fieldNames
+            `<div class="hf-debug-line">${escapeHtml(t("Debug_Fields", "Fields"))}: ${info.fieldNames
                 .map((f) => `<code>{{${escapeHtml(f)}}}</code>`)
                 .join(" ")}</div>`
         );
     }
     if (info.removedTags.length) {
         rows.push(
-            `<div class="hf-debug-line hf-warn">Sanitiser removed: ${info.removedTags
-                .map((t) => `<code>&lt;${escapeHtml(t)}&gt;</code>`)
+            `<div class="hf-debug-line hf-warn">${escapeHtml(t("Debug_Removed", "Sanitiser removed"))}: ${info.removedTags
+                .map((tag) => `<code>&lt;${escapeHtml(tag)}&gt;</code>`)
                 .join(" ")}</div>`
         );
     }
@@ -39,7 +40,10 @@ export function renderDebugPanel(host: HTMLElement, info: DebugInfo): void {
         );
     }
     if (!info.templateErrors.length && !info.removedTags.length) {
-        rows.push(`<div class="hf-debug-line hf-ok">No template or sanitiser issues.</div>`);
+        rows.push(`<div class="hf-debug-line hf-ok">${escapeHtml(t("Debug_NoIssues", "No template or sanitiser issues."))}</div>`);
     }
-    mountTrustedHtml(host, `<div class="hf-debug-title">HTML Forge diagnostics</div>${rows.join("")}`);
+    mountTrustedHtml(
+        host,
+        `<div class="hf-debug-title">${escapeHtml(t("Debug_Title", "HTML Forge diagnostics"))}</div>${rows.join("")}`
+    );
 }

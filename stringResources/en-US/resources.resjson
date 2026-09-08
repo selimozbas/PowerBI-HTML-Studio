@@ -1,0 +1,14 @@
+{
+  "NoData_Default": "Nothing to display",
+  "Aria_Default": "HTML content",
+  "Landing_Title": "HTML Forge",
+  "Landing_Intro": "Add a column or measure to the Content field to render it as HTML or SVG.",
+  "Landing_Tip_Named": "Add extra measures to Data (named fields) and reference them in a template as {{Revenue}}.",
+  "Landing_Tip_Template": "Switch Content › Content source to Template for loops, conditionals and helpers like bar(Actual, Target).",
+  "Landing_Tip_Cf": "Use Conditional formatting for rule-based styling without DAX.",
+  "Debug_Title": "HTML Forge diagnostics",
+  "Debug_NoIssues": "No template or sanitiser issues.",
+  "Debug_Rows": "row(s)",
+  "Debug_Fields": "Fields",
+  "Debug_Removed": "Sanitiser removed"
+}

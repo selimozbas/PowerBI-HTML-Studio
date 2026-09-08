@@ -79,6 +79,7 @@
         "bodyTemplate": { "type": { "text": true } },
         "rowTemplate": { "type": { "text": true } },
         "separator": { "type": { "text": true } },
+        "renderMarkdown": { "type": { "bool": true } },
         "unsafeAllowScripts": { "type": { "bool": true } },
         "noDataMessage": { "type": { "text": true } }
       }

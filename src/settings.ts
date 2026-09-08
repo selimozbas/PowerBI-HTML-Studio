@@ -65,6 +65,12 @@ class ContentCard extends Card {
         value: ""
     });
 
+    renderMarkdown = new formattingSettings.ToggleSwitch({
+        name: "renderMarkdown",
+        displayName: "Treat content as Markdown",
+        value: false
+    });
+
     unsafeAllowScripts = new formattingSettings.ToggleSwitch({
         name: "unsafeAllowScripts",
         displayName: "Allow inline <script> (unsafe)",
@@ -76,6 +82,7 @@ class ContentCard extends Card {
     slices = [
         this.contentSource,
         this.renderMode,
+        this.renderMarkdown,
         this.separator,
         this.bodyTemplate,
         this.rowTemplate,

@@ -4,12 +4,15 @@ import DataViewTable = powerbi.DataViewTable;
 import PrimitiveValue = powerbi.PrimitiveValue;
 import ISelectionId = powerbi.visuals.ISelectionId;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
+import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 
 export interface ForgeRow {
     /** Value of the field mapped to the "content" role for this row. */
     content: string;
     /** All named "data" fields plus content, keyed by column display name. */
     fields: Record<string, PrimitiveValue>;
+    /** Measures dropped in the "tooltips" field well, formatted for display. */
+    tooltip: VisualTooltipDataItem[];
     selectionId: ISelectionId;
     index: number;
 }
@@ -36,6 +39,10 @@ export function transform(dataView: DataView | undefined, host: IVisualHost): Fo
         .map((c, i) => ({ c, i }))
         .filter((x) => x.c.roles && x.c.roles.data)
         .map((x) => x.i);
+    const tooltipColIdxs = columns
+        .map((c, i) => ({ c, i }))
+        .filter((x) => x.c.roles && x.c.roles.tooltips)
+        .map((x) => x.i);
 
     const contentColumnName = contentColIdx >= 0 ? String(columns[contentColIdx].displayName) : null;
     const fieldNames = dataColIdxs.map((i) => String(columns[i].displayName));
@@ -50,6 +57,11 @@ export function transform(dataView: DataView | undefined, host: IVisualHost): Fo
         const contentValue = contentColIdx >= 0 ? raw[contentColIdx] : "";
         if (contentColumnName) fields["content"] = contentValue as PrimitiveValue;
 
+        const tooltip: VisualTooltipDataItem[] = tooltipColIdxs.map((colIndex) => ({
+            displayName: String(columns[colIndex].displayName),
+            value: raw[colIndex] == null ? "" : String(raw[colIndex])
+        }));
+
         const selectionId = host
             .createSelectionIdBuilder()
             .withTable(table, rowIndex)
@@ -58,6 +70,7 @@ export function transform(dataView: DataView | undefined, host: IVisualHost): Fo
         return {
             content: contentValue == null ? "" : String(contentValue),
             fields,
+            tooltip,
             selectionId,
             index: rowIndex
         };
