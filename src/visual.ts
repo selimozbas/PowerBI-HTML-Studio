@@ -48,6 +48,13 @@ import SubSelectionStylesType = powerbi.visuals.SubSelectionStylesType;
 /** Row count above which "per row" mode switches to windowed rendering. */
 const VIRTUALIZE_THRESHOLD = 250;
 
+// powerbi.VisualUpdateType bits (inlined so this file doesn't need the const enum).
+const UT_RESIZE = 4;
+const UT_VIEWMODE = 8;
+const UT_RESIZE_END = 32;
+/** These update types can't change the data model or settings. */
+const UT_LAYOUT_ONLY = UT_RESIZE | UT_VIEWMODE | UT_RESIZE_END;
+
 export class Visual implements IVisual {
     private host: IVisualHost;
     private root: HTMLElement;
@@ -80,6 +87,7 @@ export class Visual implements IVisual {
     private formState: FormState = {};
     private lastModel: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, columnRefs: {}, hasData: false };
     private lastRenderKey = "";
+    private destroyed = false;
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -125,13 +133,26 @@ export class Visual implements IVisual {
         this.root.appendChild(this.editBtn);
 
         this.selectionManager.registerOnSelectCallback(() => {
+            if (this.destroyed) return;
             this.selectionBinder.applyDim(this.contentEl, this.currentSelectionOptions());
         });
     }
 
     public update(options: VisualUpdateOptions): void {
+        if (this.destroyed) return;
         this.events.renderingStarted(options);
         try {
+            this.editBtn.hidden = options.viewMode !== ViewMode.Edit;
+
+            // Pure resize / view-mode updates can't change the data or the
+            // settings - skip the O(rows) transform + fingerprint entirely.
+            const layoutOnly = !!options.type && (options.type & ~UT_LAYOUT_ONLY) === 0;
+            if (layoutOnly && this.lastModel.hasData && this.settings) {
+                this.refreshLayout();
+                this.events.renderingFinished(options);
+                return;
+            }
+
             const dataView = options.dataViews && options.dataViews[0];
             this.settings = this.formattingService.populateFormattingSettingsModel(
                 VisualFormattingSettingsModel,
@@ -142,10 +163,10 @@ export class Visual implements IVisual {
 
             const model: ForgeModel = transform(dataView, this.host);
             this.lastModel = model;
-            this.editBtn.hidden = options.viewMode !== ViewMode.Edit;
 
             if (!model.hasData && !this.settings.content.noDataMessage.value) {
                 this.teardownDynamic();
+                this.lastRenderKey = "";
                 renderLanding(this.contentEl, this.translate);
                 this.styleEl.textContent = "";
                 this.debugEl.hidden = true;
@@ -162,15 +183,28 @@ export class Visual implements IVisual {
         }
     }
 
+    /** Theme CSS variables for the current report theme (empty when disabled). */
+    private themeVarsCss(): string {
+        if (!this.settings.theme.injectVars.value) return "";
+        const palette = this.host.colorPalette;
+        return buildThemeVars({
+            palette,
+            isHighContrast: (palette as unknown as { isHighContrast?: boolean }).isHighContrast
+        });
+    }
+
+    /** Cheap pass: styles + layout only, no re-render of content. */
+    private refreshLayout(): void {
+        this.root.classList.toggle("hf-print", this.settings.performance.printMode.value);
+        this.styleEl.textContent = this.composeCss(this.themeVarsCss());
+        this.applyWrapperStyles();
+        this.rowWindow?.refresh();
+        this.charts.forEach((c) => c.resize());
+    }
+
     private renderModel(model: ForgeModel): void {
         const s = this.settings;
-        const palette = this.host.colorPalette;
-        const themeVars = s.theme.injectVars.value
-            ? buildThemeVars({
-                palette,
-                isHighContrast: (palette as unknown as { isHighContrast?: boolean }).isHighContrast
-            })
-            : "";
+        const themeVars = this.themeVarsCss();
 
         const printMode = s.performance.printMode.value;
         this.root.classList.toggle("hf-print", printMode);
@@ -180,11 +214,10 @@ export class Visual implements IVisual {
         this.styleEl.textContent = this.composeCss(themeVars);
         this.applyWrapperStyles();
 
-        const renderKey = this.computeRenderKey(model);
+        const renderKey = this.computeRenderKey(model, themeVars);
         if (renderKey === this.lastRenderKey && this.contentEl.childNodes.length > 0) {
             this.rowWindow?.refresh();
-            const w = this.contentEl.clientWidth;
-            this.charts.forEach((c) => c.resize(w));
+            this.charts.forEach((c) => c.resize());
             return;
         }
         this.lastRenderKey = renderKey;
@@ -235,8 +268,11 @@ export class Visual implements IVisual {
                     return slice.fragment;
                 },
                 afterRender: () => {
+                    // Note: Bootstrap JS components (tooltip/popover/carousel) are
+                    // not re-initialised per window here - re-creating them every
+                    // scroll frame restarts carousels. Bootstrap's document data-api
+                    // (collapse/tab/dropdown) still works on the mounted rows.
                     this.markAuthorObjects();
-                    this.initFramework();
                     this.formStateBinder.restore(this.contentEl);
                     if (this.allowInteractions()) {
                         this.selectionBinder.applyDim(this.contentEl, this.currentSelectionOptions());
@@ -319,8 +355,18 @@ export class Visual implements IVisual {
     };
 
     public destroy(): void {
+        this.destroyed = true;
         this.teardownDynamic();
-        this.subSelectionHelper.destroy();
+        try {
+            this.subSelectionHelper.destroy();
+        } catch {
+            /* already gone */
+        }
+        // The selection manager keeps our registerOnSelectCallback closure
+        // (no API to remove it); drop the big references it would otherwise pin.
+        this.lastModel = { rows: [], fieldNames: [], contentColumnName: null, columnRefs: {}, hasData: false };
+        this.selectionBinder.setRows([]);
+        this.tooltipBinder.setRows([]);
     }
 
     /**
@@ -416,9 +462,13 @@ export class Visual implements IVisual {
         return ["ar", "he", "fa", "ur", "ps", "dv", "syr", "ckb", "yi"].indexOf(loc) !== -1 ? "rtl" : "ltr";
     }
 
-    private computeRenderKey(model: ForgeModel): string {
+    private computeRenderKey(model: ForgeModel, themeVars: string): string {
         const s = this.settings;
         const fp = {
+            loc: this.host.locale || "",
+            thm: themeVars,
+            aria: s.accessibility.ariaLabel.value,
+            xf: [s.crossFilter.enabled.value, s.crossFilter.contextMenu.value, s.crossFilter.transparencyPercent.value],
             cs: s.content.contentSource.value,
             rm: s.content.renderMode.value,
             md: s.content.renderMarkdown.value,

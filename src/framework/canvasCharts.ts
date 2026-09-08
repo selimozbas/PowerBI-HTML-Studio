@@ -53,7 +53,8 @@ export interface HfChartSpec {
 
 export interface ChartInstance {
     destroy(): void;
-    resize(width: number): void;
+    /** Re-measure this chart's own element and resize to it. */
+    resize(): void;
 }
 
 type Row = Record<string, unknown>;
@@ -161,7 +162,10 @@ function buildOne(node: HTMLElement, spec: HfChartSpec, rows: Row[]): ChartInsta
     const u = new uPlot(opts, data as uPlot.AlignedData, node);
     return {
         destroy: () => u.destroy(),
-        resize: (w: number) => u.setSize({ width: Math.max(80, w || width), height })
+        resize: () => u.setSize({
+            width: Math.max(80, node.clientWidth || node.parentElement?.clientWidth || width),
+            height
+        })
     };
 }
 
