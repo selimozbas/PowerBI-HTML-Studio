@@ -30,6 +30,7 @@
     "powerbi-visuals-tools": "^7.2.1",
     "powerbi-visuals-utils-dataviewutils": "^7.0.0",
     "powerbi-visuals-utils-formattingmodel": "^7.1.0",
+    "powerbi-visuals-utils-onobjectutils": "^6.0.3",
     "powerbi-visuals-utils-tooltiputils": "^7.1.0",
     "typescript": "^5.6.2",
     "vitest": "^2.1.2"

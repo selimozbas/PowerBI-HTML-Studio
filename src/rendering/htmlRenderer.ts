@@ -18,11 +18,18 @@ export interface RenderInput {
     locale: string;
 }
 
+export interface RenderRow {
+    index: number;
+    html: string;
+}
+
 export interface RenderOutput {
     html: string;
     errors: TemplateError[];
     /** true when row wrappers carry a data-hf-row selection hook */
     rowMapped: boolean;
+    /** per-row HTML for row-mapped modes, so the caller can virtualize */
+    rows?: RenderRow[];
 }
 
 export function renderContent(input: RenderInput): RenderOutput {
@@ -60,8 +67,8 @@ export function renderContent(input: RenderInput): RenderOutput {
 
     if (input.contentSource === "value") {
         if (input.renderMode === "row") {
-            const html = rows.map((r) => wrapRow(r, rowView(r), md(r.content))).join("") + moreNote;
-            return { html, errors, rowMapped: true };
+            const out: RenderRow[] = rows.map((r) => ({ index: r.index, html: wrapRow(r, rowView(r), md(r.content)) }));
+            return { html: out.map((o) => o.html).join("") + moreNote, errors, rowMapped: true, rows: out };
         }
         const sep = input.separator || "";
         const html = md(rows.map((r) => r.content).join(sep));
@@ -71,13 +78,13 @@ export function renderContent(input: RenderInput): RenderOutput {
     // template mode
     if (input.renderMode === "row") {
         const tpl = input.rowTemplate || "{{{content}}}";
-        let html = "";
+        const out: RenderRow[] = [];
         for (const r of rows) {
             const res = renderTemplate(tpl, rowView(r), helpers);
             errors.push(...res.errors);
-            html += wrapRow(r, rowView(r), md(res.html));
+            out.push({ index: r.index, html: wrapRow(r, rowView(r), md(res.html)) });
         }
-        return { html: html + moreNote, errors, rowMapped: true };
+        return { html: out.map((o) => o.html).join("") + moreNote, errors, rowMapped: true, rows: out };
     }
 
     const body = input.bodyTemplate || "{{#each rows}}{{{content}}}{{/each}}";

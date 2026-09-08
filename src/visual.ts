@@ -18,6 +18,7 @@ import { sanitizeToFragment } from "./rendering/sanitize";
 import { buildThemeVars } from "./theme/themeVars";
 import { buildFontCss } from "./theme/fonts";
 import { activateComponents, ComponentState } from "./rendering/components";
+import { RowWindow } from "./rendering/rowWindow";
 import { SelectionBinder, SelectionOptions } from "./interactivity/selection";
 import { TooltipBinder } from "./interactivity/tooltip";
 import { renderDebugPanel } from "./ui/debugPanel";
@@ -28,6 +29,9 @@ import { TemplateEditorDialog, EditorInitialState, EditorResultState } from "./d
 
 import DialogAction = powerbi.DialogAction;
 import ViewMode = powerbi.ViewMode;
+
+/** Row count above which "per row" mode switches to windowed rendering. */
+const VIRTUALIZE_THRESHOLD = 250;
 
 export class Visual implements IVisual {
     private host: IVisualHost;
@@ -48,6 +52,8 @@ export class Visual implements IVisual {
     private detachComponents: (() => void) | null = null;
     private detachSelection: (() => void) | null = null;
     private detachTooltip: (() => void) | null = null;
+    private detachLinks: (() => void) | null = null;
+    private rowWindow: RowWindow | null = null;
     private componentState: ComponentState = {};
     private lastModel: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, hasData: false };
     private lastRenderKey = "";
@@ -134,6 +140,7 @@ export class Visual implements IVisual {
 
         const renderKey = this.computeRenderKey(model);
         if (renderKey === this.lastRenderKey && this.contentEl.childNodes.length > 0) {
+            this.rowWindow?.refresh();
             return;
         }
         this.lastRenderKey = renderKey;
@@ -155,24 +162,51 @@ export class Visual implements IVisual {
             locale: this.host.locale || "en-US"
         });
 
-        const sanitized = sanitizeToFragment(rendered.html, {
+        const sanOpts = {
             enabled: s.sanitization.enabled.value,
             allowSvg: s.sanitization.allowSvg.value,
             allowStyleTag: s.sanitization.allowStyleTag.value,
             allowScripts: s.content.unsafeAllowScripts.value,
             extraTags: splitList(s.sanitization.extraAllowedTags.value),
             extraAttrs: splitList(s.sanitization.extraAllowedAttrs.value)
-        });
+        };
 
         this.teardownDynamic();
-        mountFragment(this.contentEl, sanitized.fragment);
+
+        const rows = rendered.rows;
+        const virtualize = !!rendered.rowMapped && !!rows && rows.length > VIRTUALIZE_THRESHOLD;
+        let removed: string[] = [];
+
+        if (virtualize && rows) {
+            this.rowWindow = new RowWindow({
+                scrollEl: this.contentEl,
+                total: rows.length,
+                estRowHeight: 28,
+                buffer: 8,
+                renderRange: (start, end) => {
+                    const slice = sanitizeToFragment(rows.slice(start, end).map((r) => r.html).join(""), sanOpts);
+                    removed = slice.removed;
+                    return slice.fragment;
+                },
+                afterRender: () => {
+                    if (this.allowInteractions()) {
+                        this.selectionBinder.applyDim(this.contentEl, this.currentSelectionOptions());
+                    }
+                }
+            });
+        } else {
+            const sanitized = sanitizeToFragment(rendered.html, sanOpts);
+            removed = sanitized.removed;
+            mountFragment(this.contentEl, sanitized.fragment);
+        }
+
         this.contentEl.setAttribute(
             "aria-label",
             s.accessibility.ariaLabel.value || this.translate("Aria_Default", "HTML content")
         );
         this.contentEl.setAttribute("role", "region");
 
-        if (s.hyperlinks.enabled.value) this.interceptLinks();
+        if (s.hyperlinks.enabled.value) this.detachLinks = this.interceptLinks();
 
         this.tooltipBinder.setRows(model.rows);
         this.detachTooltip = this.tooltipBinder.attach(this.contentEl);
@@ -199,7 +233,7 @@ export class Visual implements IVisual {
                 this.debugEl,
                 {
                     templateErrors: rendered.errors,
-                    removedTags: sanitized.removed,
+                    removedTags: removed,
                     rowCount: model.rows.length,
                     fieldNames: model.fieldNames
                 },
@@ -228,16 +262,19 @@ export class Visual implements IVisual {
         };
     }
 
-    private interceptLinks(): void {
-        this.contentEl.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((a) => {
-            const href = a.getAttribute("href") || "";
+    /** Delegated so it also covers rows mounted later by the virtualizer. */
+    private interceptLinks(): () => void {
+        const onClick = (ev: MouseEvent): void => {
+            const anchor = (ev.target as HTMLElement)?.closest?.("a[href]") as HTMLAnchorElement | null;
+            if (!anchor) return;
+            const href = anchor.getAttribute("href") || "";
             if (/^https?:\/\//i.test(href)) {
-                a.addEventListener("click", (ev) => {
-                    ev.preventDefault();
-                    this.host.launchUrl(href);
-                });
+                ev.preventDefault();
+                this.host.launchUrl(href);
             }
-        });
+        };
+        this.contentEl.addEventListener("click", onClick);
+        return () => this.contentEl.removeEventListener("click", onClick);
     }
 
     private composeCss(themeVars: string): string {
@@ -386,9 +423,13 @@ export class Visual implements IVisual {
         this.detachComponents?.();
         this.detachSelection?.();
         this.detachTooltip?.();
+        this.detachLinks?.();
+        this.rowWindow?.destroy();
         this.detachComponents = null;
         this.detachSelection = null;
         this.detachTooltip = null;
+        this.detachLinks = null;
+        this.rowWindow = null;
         clearElement(this.contentEl);
     }
 }
