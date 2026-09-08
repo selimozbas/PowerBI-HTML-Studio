@@ -6,7 +6,8 @@
     </linearGradient>
   </defs>
 
-  <rect x="8" y="8" width="1104" height="388" rx="14" fill="#ffffff" stroke="#E1DFDD"/>
+  <rect x="0" y="0" width="1120" height="404" rx="14" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="1119" height="403" rx="13.5" fill="none" stroke="#E1DFDD"/>
 
   <!-- header -->
   <path d="M34 40 l7 -8 5 5 8 -12 5 4" fill="none" stroke="#118DFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
