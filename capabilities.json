@@ -183,6 +183,21 @@
         "enableJs": { "type": { "bool": true } }
       }
     },
+    "slicer": {
+      "properties": {
+        "enabled": { "type": { "bool": true } }
+      }
+    },
+    "writeback": {
+      "properties": {
+        "enabled": { "type": { "bool": true } }
+      }
+    },
+    "general": {
+      "properties": {
+        "filter": { "type": { "filter": {} } }
+      }
+    },
     "performance": {
       "properties": {
         "maxRows": { "type": { "numeric": true } }
@@ -196,6 +211,7 @@
     "persistedState": {
       "properties": {
         "componentState": { "type": { "text": true } },
+        "formState": { "type": { "text": true } },
         "editorContent": { "type": { "text": true } }
       }
     }

@@ -22,6 +22,8 @@ a lot more built in.
 | Interactivity | **Sandbox-safe components** — tabs & accordion via `data-` attributes, state persisted with `persistProperties` |
 | Interactivity | Cross-filter by row **or by field value** (`data-hf-select="Region:North"`), multi-select, dimming, right-click context menu, `http(s)` links via `launchUrl` |
 | Interactivity | Default Power BI **tooltips** for measures in the Tooltips field well |
+| Interactivity | **HTML slicer mode** — `data-hf-filter="Region:North"` applies a real report filter (`applyJsonFilter`) so a hand-built HTML nav/list filters every other visual; `data-hf-filter-clear` resets |
+| Interactivity | **Viewer write-back** — `data-hf-state="key"` on inputs / textareas / selects persists their value with the report (shared checklist / sign-off) |
 | Theming | Active report theme exposed as CSS variables (`--hf-accent`, `--hf-foreground`, …) |
 | Theming | **Fonts** card — Google Fonts families (`@import`, WebAccess-gated) or self-hosted `@font-face` (data-URI) |
 | i18n | **Text direction** auto (from locale) / LTR / RTL; locale-aware `number` / `percent` / `currency` / `date` helpers |
@@ -48,6 +50,8 @@ per-region) sub-selection, and a bigger template gallery.
 | `data-hf-acc="id"` + `data-hf-acc-panel="id"` | accordion section |
 | `data-hf-object="content"` | marks a region sub-selectable for on-object formatting in format mode |
 | `data-hf-chart='{…}'` | renders a uPlot chart into the element (spec: type, x, y[], data, height, legend, colors) |
+| `data-hf-filter="Region:North"` | applies a report filter (HTML slicer mode) |
+| `data-hf-state="key"` | remembers this input's value with the report (write-back mode) |
 | `data-bs-*` | Bootstrap 5 component behaviour |
 
 Template helper `{{{selectAttr("Region", Region)}}}` emits the first one.

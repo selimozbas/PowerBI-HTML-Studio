@@ -5,6 +5,7 @@ import type { ForgeModel } from "../src/dataView/transform";
 function model(n: number): ForgeModel {
     return {
         hasData: true,
+        columnRefs: {},
         fieldNames: ["Actual"],
         contentColumnName: "Name",
         rows: Array.from({ length: n }, (_, i) => ({

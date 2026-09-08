@@ -17,15 +17,22 @@ export interface ForgeRow {
     index: number;
 }
 
+export interface ColumnRef {
+    table: string;
+    column: string;
+}
+
 export interface ForgeModel {
     rows: ForgeRow[];
     /** Display names of the named "data" fields, in field-well order. */
     fieldNames: string[];
     contentColumnName: string | null;
+    /** display name -> { table, column } for non-measure columns, for applyJsonFilter. */
+    columnRefs: Record<string, ColumnRef>;
     hasData: boolean;
 }
 
-const EMPTY: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, hasData: false };
+const EMPTY: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, columnRefs: {}, hasData: false };
 
 export function transform(dataView: DataView | undefined, host: IVisualHost): ForgeModel {
     const table: DataViewTable | undefined = dataView && dataView.table;
@@ -46,6 +53,16 @@ export function transform(dataView: DataView | undefined, host: IVisualHost): Fo
 
     const contentColumnName = contentColIdx >= 0 ? String(columns[contentColIdx].displayName) : null;
     const fieldNames = dataColIdxs.map((i) => String(columns[i].displayName));
+
+    const columnRefs: Record<string, { table: string; column: string }> = {};
+    columns.forEach((col) => {
+        if (col.isMeasure || !col.roles || !(col.roles.content || col.roles.data)) return;
+        const qn = String(col.queryName || "");
+        const dot = qn.indexOf(".");
+        if (dot > 0) {
+            columnRefs[String(col.displayName)] = { table: qn.slice(0, dot), column: qn.slice(dot + 1) };
+        }
+    });
 
     const rows: ForgeRow[] = table.rows.map((raw, rowIndex) => {
         const fields: Record<string, PrimitiveValue> = {};
@@ -76,5 +93,5 @@ export function transform(dataView: DataView | undefined, host: IVisualHost): Fo
         };
     });
 
-    return { rows, fieldNames, contentColumnName, hasData: true };
+    return { rows, fieldNames, contentColumnName, columnRefs, hasData: true };
 }

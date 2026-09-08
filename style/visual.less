@@ -41,6 +41,15 @@ body {
         outline-offset: 1px;
     }
 
+    [data-hf-filter] {
+        cursor: pointer;
+    }
+
+    [data-hf-filter].hf-filter-active {
+        background: var(--hf-accent, #118dff);
+        color: #fff;
+    }
+
     .hf-edit-btn {
         position: absolute;
         top: 4px;

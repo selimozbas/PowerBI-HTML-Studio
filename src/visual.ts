@@ -20,6 +20,8 @@ import { buildFontCss } from "./theme/fonts";
 import { activateComponents, ComponentState } from "./rendering/components";
 import { RowWindow } from "./rendering/rowWindow";
 import { SelectionBinder, SelectionOptions } from "./interactivity/selection";
+import { SlicerBinder } from "./interactivity/slicer";
+import { FormStateBinder, FormState } from "./interactivity/formState";
 import { TooltipBinder } from "./interactivity/tooltip";
 import { renderDebugPanel } from "./ui/debugPanel";
 import { renderLanding } from "./landing/landing";
@@ -56,6 +58,8 @@ export class Visual implements IVisual {
     private events: IVisualEventService;
     private selectionManager: ISelectionManager;
     private selectionBinder: SelectionBinder;
+    private slicerBinder: SlicerBinder;
+    private formStateBinder = new FormStateBinder();
     private tooltipBinder: TooltipBinder;
     private subSelectionHelper: HtmlSubSelectionHelper;
     private formattingService: FormattingSettingsService;
@@ -65,12 +69,15 @@ export class Visual implements IVisual {
     private detachComponents: (() => void) | null = null;
     private detachSelection: (() => void) | null = null;
     private detachTooltip: (() => void) | null = null;
+    private detachSlicer: (() => void) | null = null;
+    private detachForm: (() => void) | null = null;
     private detachLinks: (() => void) | null = null;
     private rowWindow: RowWindow | null = null;
     private bsInstances: BsDisposable[] = [];
     private charts: ChartInstance[] = [];
     private componentState: ComponentState = {};
-    private lastModel: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, hasData: false };
+    private formState: FormState = {};
+    private lastModel: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, columnRefs: {}, hasData: false };
     private lastRenderKey = "";
 
     constructor(options: VisualConstructorOptions) {
@@ -79,6 +86,7 @@ export class Visual implements IVisual {
         this.formattingService = new FormattingSettingsService();
         this.selectionManager = this.host.createSelectionManager();
         this.selectionBinder = new SelectionBinder(this.selectionManager);
+        this.slicerBinder = new SlicerBinder(this.host);
         this.tooltipBinder = new TooltipBinder(this.host.tooltipService);
         this.translate = makeTranslator(this.host.createLocalizationManager());
 
@@ -224,6 +232,7 @@ export class Visual implements IVisual {
                 afterRender: () => {
                     this.markAuthorObjects();
                     this.initFramework();
+                    this.formStateBinder.restore(this.contentEl);
                     if (this.allowInteractions()) {
                         this.selectionBinder.applyDim(this.contentEl, this.currentSelectionOptions());
                     }
@@ -257,6 +266,16 @@ export class Visual implements IVisual {
         if (this.allowInteractions()) {
             this.detachSelection = this.selectionBinder.attach(this.contentEl, this.currentSelectionOptions());
         }
+
+        this.slicerBinder.setColumnRefs(model.columnRefs);
+        this.detachSlicer = this.slicerBinder.attach(this.contentEl, s.slicer.enabled.value && this.allowInteractions());
+
+        this.formStateBinder.setState(this.formState);
+        this.formStateBinder.restore(this.contentEl);
+        this.detachForm = this.formStateBinder.attach(this.contentEl, s.writeback.enabled.value, (state) => {
+            this.formState = state;
+            this.persistState();
+        });
 
         if (s.components.enabled.value) {
             this.detachComponents = activateComponents(this.contentEl, {
@@ -407,6 +426,8 @@ export class Visual implements IVisual {
             dbg: s.debug.showPanel.value,
             hl: s.hyperlinks.enabled.value,
             bs: s.bootstrap.enableJs.value,
+            sl: s.slicer.enabled.value,
+            wb: s.writeback.enabled.value,
             cmp: [s.components.enabled.value, s.components.persistState.value],
             cf: [s.conditionalFormatting.enabled.value, s.conditionalFormatting.rules.value],
             san: [
@@ -436,14 +457,9 @@ export class Visual implements IVisual {
     /* --------------------- state persistence -------------------------- */
 
     private restorePersistedState(dataView: powerbi.DataView | undefined): void {
-        const raw = dataView?.metadata?.objects?.persistedState?.componentState;
-        if (typeof raw === "string" && raw) {
-            try {
-                this.componentState = JSON.parse(raw) as ComponentState;
-            } catch {
-                this.componentState = {};
-            }
-        }
+        const objects = dataView?.metadata?.objects?.persistedState;
+        this.componentState = parseJsonObject(objects?.componentState) as ComponentState;
+        this.formState = parseJsonObject(objects?.formState) as FormState;
     }
 
     private openTemplateEditor(): void {
@@ -502,7 +518,10 @@ export class Visual implements IVisual {
                 {
                     objectName: "persistedState",
                     selector: null,
-                    properties: { componentState: JSON.stringify(this.componentState) }
+                    properties: {
+                        componentState: JSON.stringify(this.componentState),
+                        formState: JSON.stringify(this.formState)
+                    }
                 }
             ]
         } as unknown as VisualObjectInstancesToPersist;
@@ -513,6 +532,8 @@ export class Visual implements IVisual {
         this.detachComponents?.();
         this.detachSelection?.();
         this.detachTooltip?.();
+        this.detachSlicer?.();
+        this.detachForm?.();
         this.detachLinks?.();
         this.rowWindow?.destroy();
         disposeBootstrap(this.bsInstances);
@@ -522,9 +543,21 @@ export class Visual implements IVisual {
         this.detachComponents = null;
         this.detachSelection = null;
         this.detachTooltip = null;
+        this.detachSlicer = null;
+        this.detachForm = null;
         this.detachLinks = null;
         this.rowWindow = null;
         clearElement(this.contentEl);
+    }
+}
+
+function parseJsonObject(raw: unknown): Record<string, unknown> {
+    if (typeof raw !== "string" || !raw) return {};
+    try {
+        const v = JSON.parse(raw);
+        return v && typeof v === "object" ? (v as Record<string, unknown>) : {};
+    } catch {
+        return {};
     }
 }
 

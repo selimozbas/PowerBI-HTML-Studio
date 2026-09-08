@@ -342,6 +342,30 @@ class AccessibilityCard extends Card {
     slices = [this.ariaLabel];
 }
 
+class WritebackCard extends Card {
+    enabled = new formattingSettings.ToggleSwitch({
+        name: "enabled",
+        displayName: "Remember form input (data-hf-state)",
+        value: false
+    });
+
+    name = "writeback";
+    displayName = "Viewer write-back";
+    slices = [this.enabled];
+}
+
+class SlicerCard extends Card {
+    enabled = new formattingSettings.ToggleSwitch({
+        name: "enabled",
+        displayName: "Filter the report from data-hf-filter elements",
+        value: false
+    });
+
+    name = "slicer";
+    displayName = "HTML slicer";
+    slices = [this.enabled];
+}
+
 class BootstrapCard extends Card {
     enableJs = new formattingSettings.ToggleSwitch({
         name: "enableJs",
@@ -387,6 +411,8 @@ export class VisualFormattingSettingsModel extends Model {
     conditionalFormatting = new ConditionalFormattingCard();
     components = new ComponentsCard();
     crossFilter = new CrossFilterCard();
+    slicer = new SlicerCard();
+    writeback = new WritebackCard();
     hyperlinks = new HyperlinksCard();
     sanitization = new SanitizationCard();
     theme = new ThemeCard();
@@ -403,6 +429,8 @@ export class VisualFormattingSettingsModel extends Model {
         this.conditionalFormatting,
         this.components,
         this.crossFilter,
+        this.slicer,
+        this.writeback,
         this.hyperlinks,
         this.sanitization,
         this.theme,
