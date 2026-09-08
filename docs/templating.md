@@ -8,8 +8,15 @@ it stays inside the Power BI sandbox and is safe against code injection.
 
 | Syntax | Output |
 | --- | --- |
-| `{{ expr }}` | value of `expr`, **HTML-escaped** |
-| `{{{ expr }}}` | value of `expr`, **raw** (use this for helpers that return markup, e.g. `{{{bar(a,b)}}}`) |
+| `{{ expr }}` | value of `expr`, **HTML-escaped** — use for plain text / labels |
+| `{{{ expr }}}` | value of `expr`, **raw HTML** — use for helpers that return markup (`{{{bar(a,b)}}}`) **and when the field value is itself HTML** (`{{{content}}}`) |
+
+> If your **Content** field already produces complete HTML, you usually don't
+> need a template at all — leave *Content source* on **Field value** and it
+> renders as-is. Only switch to *Template* when you want to build markup around
+> your fields; then remember `{{{content}}}` (triple braces) to inject HTML
+> rather than escape it. The gallery's *Pass through HTML* / *Wrap HTML*
+> starters do exactly this.
 
 `expr` can be:
 

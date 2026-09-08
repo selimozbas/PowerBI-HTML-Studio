@@ -12,9 +12,31 @@ export interface TemplateSample {
 
 export const TEMPLATE_GALLERY: TemplateSample[] = [
     {
+        id: "passthrough",
+        name: "Pass through HTML",
+        description: "Render the Content field's own HTML as-is, one block per row. Use this when Content already produces HTML (or just set Content source back to \"Field value\").",
+        template: [
+            '{{#each rows}}',
+            '  {{{content}}}',
+            '{{/each}}'
+        ].join("\n")
+    },
+    {
+        id: "wrap-html",
+        name: "Wrap HTML",
+        description: "Your Content HTML inside a themed card. Note the triple braces {{{content}}} for raw HTML.",
+        template: [
+            '{{#each rows}}',
+            '<div class="card mb-2"><div class="card-body">',
+            '  {{{content}}}',
+            '</div></div>',
+            '{{/each}}'
+        ].join("\n")
+    },
+    {
         id: "kpi-card",
         name: "KPI card",
-        description: "Single figure with a caption and a progress bar.",
+        description: "Content = a text label; put Actual / Target measures in the Data well. Caption + big number + progress bar.",
         template: [
             '<div class="hf-card" style="padding:12px;border:1px solid var(--hf-track);border-radius:8px">',
             '  {{#each rows}}',
@@ -28,7 +50,7 @@ export const TEMPLATE_GALLERY: TemplateSample[] = [
     {
         id: "progress-list",
         name: "Progress list",
-        description: "One row per item with a label, value and inline bar.",
+        description: "Content = a label; Actual / Target measures in the Data well. One row per item with a value and inline bar.",
         template: [
             '<table style="width:100%;border-collapse:collapse">',
             '  {{#each rows}}',
