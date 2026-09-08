@@ -6,6 +6,9 @@ export const HELPER_NAMES = [
     "format", "number", "percent", "currency", "date",
     "upper", "lower", "trim", "default",
     "add", "sub", "mul", "div", "pct", "round", "json",
+    "sum", "avg", "min", "max", "count", "pluck", "first", "last",
+    "sortBy", "where", "whereNot", "top", "bottom", "rank", "pctOfTotal", "groupBy",
+    "colorScale", "relativeTime", "duration",
     "selectAttr", "sparkline", "bar", "ring", "rating"
 ];
 

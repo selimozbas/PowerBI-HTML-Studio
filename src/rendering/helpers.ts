@@ -1,6 +1,7 @@
 import { Helper } from "./templateEngine";
 import { formatValue } from "./format";
 import { sparkline, bar, ring, rating } from "./charts";
+import { buildCollectionHelpers } from "./collectionHelpers";
 
 /**
  * The helper functions exposed to templates as {{ name(args) }}.
@@ -8,6 +9,7 @@ import { sparkline, bar, ring, rating } from "./charts";
  */
 export function buildHelpers(locale = "en-US"): Record<string, Helper> {
     return {
+        ...buildCollectionHelpers(),
         format: (v, pattern) => formatValue(v, String(pattern ?? ""), locale),
         upper: (v) => String(v ?? "").toUpperCase(),
         lower: (v) => String(v ?? "").toLowerCase(),
