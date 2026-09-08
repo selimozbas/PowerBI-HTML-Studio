@@ -15,6 +15,7 @@
     "prepackage": "node scripts/embed-bootstrap.mjs",
     "start": "pbiviz start",
     "package": "pbiviz package",
+    "postpackage": "node scripts/rename-pbiviz.mjs",
     "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.strict.json",
     "test": "vitest run",

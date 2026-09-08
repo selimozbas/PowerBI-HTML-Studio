@@ -94,8 +94,10 @@ in CI too.
 
 1. Bump `version` in `pbiviz.json` (`x.y.z.0`) and `package.json` (`x.y.z`),
    update `CHANGELOG.md`.
-2. `npm run package`.
-3. `gh release create vX.Y.Z dist/htmlStudio*.pbiviz --notes-file CHANGELOG.md`.
+2. `npm run package` — `pbiviz` emits `dist/htmlStudio<guid>.x.y.z.0.pbiviz`
+   (the GUID-based name it always uses); the `postpackage` script then copies
+   it to the friendlier `dist/html-studio-x.y.z.pbiviz`.
+3. `gh release create vX.Y.Z dist/html-studio-X.Y.Z.pbiviz --notes-file CHANGELOG.md`.
 
 ## Tests
 
