@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { TEMPLATE_GALLERY } from "../src/editor/gallery";
 import { renderTemplate } from "../src/rendering/templateEngine";
 import { buildHelpers } from "../src/rendering/helpers";
+import { COMPONENT_LIBRARY } from "../src/components/library";
 
 const helpers = buildHelpers();
 const sampleView = {
@@ -15,7 +16,7 @@ const sampleView = {
 describe("template gallery", () => {
     for (const sample of TEMPLATE_GALLERY) {
         it(`"${sample.name}" renders without template errors`, () => {
-            const res = renderTemplate(sample.template, sampleView, helpers);
+            const res = renderTemplate(sample.template, sampleView, helpers, COMPONENT_LIBRARY);
             expect(res.errors).toEqual([]);
             expect(res.html.length).toBeGreaterThan(0);
         });

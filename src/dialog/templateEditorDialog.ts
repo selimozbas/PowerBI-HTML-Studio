@@ -7,6 +7,7 @@ import { registerTemplateLanguage, TEMPLATE_LANGUAGE_ID } from "../editor/templa
 import { TEMPLATE_GALLERY } from "../editor/gallery";
 import { renderTemplate } from "../rendering/templateEngine";
 import { buildHelpers } from "../rendering/helpers";
+import { COMPONENT_LIBRARY } from "../components/library";
 import { sanitizeToFragment } from "../rendering/sanitize";
 import { mountFragment, mountTrustedHtml } from "../dom/inject";
 
@@ -115,7 +116,7 @@ export class TemplateEditorDialog {
 
     private renderPreview(template: string): void {
         const view = { rows: this.sampleRows, rowCount: this.sampleRows.length };
-        const res = renderTemplate(template, view, this.helpers);
+        const res = renderTemplate(template, view, this.helpers, COMPONENT_LIBRARY);
         const sanitized = sanitizeToFragment(res.html, {
             enabled: true,
             allowSvg: true,

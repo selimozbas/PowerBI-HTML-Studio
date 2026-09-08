@@ -58,6 +58,13 @@ class ContentCard extends Card {
         value: ""
     });
 
+    partials = new formattingSettings.TextArea({
+        name: "partials",
+        displayName: "Partials",
+        placeholder: "@partial myCard\n<div class=\"card\">{{title}}</div>",
+        value: ""
+    });
+
     noDataMessage = new formattingSettings.TextInput({
         name: "noDataMessage",
         displayName: "No-data message",
@@ -86,6 +93,7 @@ class ContentCard extends Card {
         this.separator,
         this.bodyTemplate,
         this.rowTemplate,
+        this.partials,
         this.noDataMessage,
         this.unsafeAllowScripts
     ];

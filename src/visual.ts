@@ -35,6 +35,7 @@ import {
 } from "powerbi-visuals-utils-onobjectutils";
 import { getSubSelectionStyles, getSubSelectionShortcuts, HF_OBJECT_MAP } from "./onObject/subSelection";
 import { initBootstrap, disposeBootstrap, injectBootstrapCss, BsDisposable } from "./framework/bootstrapRuntime";
+import { COMPONENT_LIBRARY, parseUserPartials } from "./components/library";
 
 import DialogAction = powerbi.DialogAction;
 import ViewMode = powerbi.ViewMode;
@@ -182,6 +183,7 @@ export class Visual implements IVisual {
             separator: this.decodeSeparator(s.content.separator.value),
             noDataMessage: s.content.noDataMessage.value,
             rowLimit: s.performance.maxRows.value,
+            partials: { ...COMPONENT_LIBRARY, ...parseUserPartials(s.content.partials.value) },
             conditionalFormatting: {
                 enabled: s.conditionalFormatting.enabled.value,
                 rulesRaw: s.conditionalFormatting.rules.value
@@ -388,6 +390,7 @@ export class Visual implements IVisual {
             md: s.content.renderMarkdown.value,
             bt: s.content.bodyTemplate.value,
             rt: s.content.rowTemplate.value,
+            pt: s.content.partials.value,
             sep: s.content.separator.value,
             ndm: s.content.noDataMessage.value,
             uas: s.content.unsafeAllowScripts.value,

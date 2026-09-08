@@ -98,6 +98,21 @@ export const TEMPLATE_GALLERY: TemplateSample[] = [
         ].join("\n")
     },
     {
+        id: "component-dashboard",
+        name: "Component dashboard",
+        description: "Uses the built-in component library ({{> kpi}}, {{> trend}}, {{> sparkRow}}).",
+        template: [
+            '<div class="row g-2">',
+            '  {{#each rows}}',
+            '  <div class="col-sm-6 col-lg-3">{{> kpi label=content value=Actual target=Target}}</div>',
+            '  {{/each}}',
+            '</div>',
+            '<hr/>',
+            '{{#each rows}}{{> sparkRow label=content series=Series value=Actual}}{{/each}}',
+            '<div class="mt-2 text-secondary small">Total {{number(sum(rows, "Actual"))}} across {{count(rows)}} items</div>'
+        ].join("\n")
+    },
+    {
         id: "badge-table",
         name: "Status table",
         description: "Rows with a coloured status pill (pair with Conditional formatting).",

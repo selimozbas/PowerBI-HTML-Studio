@@ -13,6 +13,8 @@ a lot more built in.
 | --- | --- |
 | Content | CSP-safe **templating engine** — `{{field}}`, `{{#each rows}}`, `{{#if a > b}}`, helpers (`format`, `bar`, `ring`, `sparkline`, `rating`, math/string) |
 | Content | **Named data fields** — drop extra measures in *Data* and reference them as `{{Revenue}}`; no DAX string concatenation |
+| Content | **Aggregation helpers** — `sum` / `avg` / `top` / `where` / `sortBy` / `rank` / `pctOfTotal` / `groupBy` … subtotals, leaderboards and grouped sections without DAX |
+| Content | **Partials + component library** — `{{> kpi label=… value=… target=…}}`; ~15 built-in components (kpi, trend, gauge, sparkRow, pill, ratingStars…), extend/override via the *Partials* setting |
 | Styling | **Rule-based conditional formatting** authored as JSON, applied per row without DAX |
 | Content | **Markdown mode** — GitHub-flavoured, per row or per block, still sanitised |
 | Interactivity | **Sandbox-safe components** — tabs & accordion via `data-` attributes, state persisted with `persistProperties` |

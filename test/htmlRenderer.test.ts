@@ -26,6 +26,7 @@ const base = {
     separator: "",
     noDataMessage: "",
     rowLimit: 0,
+    partials: {},
     conditionalFormatting: { enabled: false, rulesRaw: "" },
     locale: "en-US"
 };

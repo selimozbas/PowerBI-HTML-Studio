@@ -14,6 +14,7 @@ export interface RenderInput {
     separator: string;
     noDataMessage: string;
     rowLimit: number;
+    partials: Record<string, string>;
     conditionalFormatting: { enabled: boolean; rulesRaw: string };
     locale: string;
 }
@@ -80,7 +81,7 @@ export function renderContent(input: RenderInput): RenderOutput {
         const tpl = input.rowTemplate || "{{{content}}}";
         const out: RenderRow[] = [];
         for (const r of rows) {
-            const res = renderTemplate(tpl, rowView(r), helpers);
+            const res = renderTemplate(tpl, rowView(r), helpers, input.partials);
             errors.push(...res.errors);
             out.push({ index: r.index, html: wrapRow(r, rowView(r), md(res.html)) });
         }
@@ -94,7 +95,7 @@ export function renderContent(input: RenderInput): RenderOutput {
         rowCount: rows.length,
         totalRowCount: model.rows.length
     };
-    const res = renderTemplate(body, view, helpers);
+    const res = renderTemplate(body, view, helpers, input.partials);
     errors.push(...res.errors);
     return { html: md(res.html) + moreNote, errors, rowMapped: false };
 }

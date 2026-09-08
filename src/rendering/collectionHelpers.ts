@@ -95,7 +95,16 @@ export function buildCollectionHelpers(): Record<string, Helper> {
         },
         colorScale: (value, min, max, from, to) => interpolateColor(Number(value), Number(min), Number(max), String(from || "#ffffff"), String(to || "#118dff")),
         relativeTime: (v) => relativeTime(v),
-        duration: (seconds) => formatDuration(Number(seconds))
+        duration: (seconds) => formatDuration(Number(seconds)),
+        split: (str, sep) => String(str ?? "").split(sep ? String(sep) : ",").map((s) => s.trim()).filter(Boolean),
+        join: (list, sep) => asArray(list).join(sep === undefined ? ", " : String(sep)),
+        initials: (name) =>
+            String(name ?? "")
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((w) => w[0]?.toUpperCase() ?? "")
+                .join("")
     };
 }
 

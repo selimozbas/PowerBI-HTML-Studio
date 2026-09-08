@@ -78,6 +78,7 @@
         },
         "bodyTemplate": { "type": { "text": true } },
         "rowTemplate": { "type": { "text": true } },
+        "partials": { "type": { "text": true } },
         "separator": { "type": { "text": true } },
         "renderMarkdown": { "type": { "bool": true } },
         "unsafeAllowScripts": { "type": { "bool": true } },

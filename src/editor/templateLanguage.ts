@@ -1,4 +1,5 @@
 import type * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
+import { COMPONENT_NAMES } from "../components/library";
 
 export const TEMPLATE_LANGUAGE_ID = "hf-template";
 
@@ -119,6 +120,15 @@ export function registerTemplateLanguage(
             }
             for (const b of BLOCK_KEYWORDS) {
                 suggestions.push({ label: `#${b}`, kind: K.Keyword, insertText: b === "else" ? "else" : `#${b} `, range });
+            }
+            for (const c of COMPONENT_NAMES) {
+                suggestions.push({
+                    label: `> ${c}`,
+                    kind: K.Module,
+                    insertText: `> ${c} `,
+                    detail: "component",
+                    range
+                });
             }
             suggestions.push(
                 {
