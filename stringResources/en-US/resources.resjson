@@ -10,5 +10,6 @@
   "Debug_NoIssues": "No template or sanitiser issues.",
   "Debug_Rows": "row(s)",
   "Debug_Fields": "Fields",
-  "Debug_Removed": "Sanitiser removed"
+  "Debug_Removed": "Sanitiser removed",
+  "Debug_Weakened": "Extra allowed tags / attributes are widening the sanitiser."
 }

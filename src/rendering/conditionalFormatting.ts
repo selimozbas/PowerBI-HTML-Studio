@@ -46,17 +46,37 @@ export interface CfRule {
 
 export interface CfResult { style: string; classes: string[]; }
 
+// Allow-list: camelCase / CSS name -> CSS property. Anything not here is
+// dropped (a CF rule must not be able to emit e.g. `position:fixed` or
+// `background-image:url(https://tracker/x)`).
 const STYLE_KEYS: Record<string, string> = {
     color: "color",
+    fontColor: "color",
     background: "background-color",
     backgroundColor: "background-color",
+    "background-color": "background-color",
     fontWeight: "font-weight",
+    "font-weight": "font-weight",
     fontStyle: "font-style",
+    "font-style": "font-style",
+    fontSize: "font-size",
+    "font-size": "font-size",
+    textDecoration: "text-decoration",
+    "text-decoration": "text-decoration",
     border: "border",
     borderLeft: "border-left",
+    "border-left": "border-left",
+    borderColor: "border-color",
+    borderRadius: "border-radius",
     textAlign: "text-align",
+    "text-align": "text-align",
     opacity: "opacity"
 };
+
+/** Reject values that can fetch or execute. */
+function safeStyleValue(v: string): boolean {
+    return !/url\s*\(|expression\s*\(|@import|javascript:|<\/?[a-z]/i.test(v);
+}
 
 export function parseRules(raw: string): { rules: CfRule[]; error?: string } {
     if (!raw || !raw.trim()) return { rules: [] };
@@ -84,7 +104,9 @@ export function evaluateRules(rules: CfRule[], row: Record<string, unknown>): Cf
         if (rule.class) classes.push(rule.class);
         if (rule.style) {
             for (const k of Object.keys(rule.style)) {
-                styleObj[STYLE_KEYS[k] || k] = rule.style[k];
+                const prop = STYLE_KEYS[k];
+                const val = String(rule.style[k]);
+                if (prop && safeStyleValue(val)) styleObj[prop] = val;
             }
         }
     }

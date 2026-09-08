@@ -78,7 +78,9 @@ class ContentCard extends Card {
 
     unsafeAllowScripts = new formattingSettings.ToggleSwitch({
         name: "unsafeAllowScripts",
-        displayName: "Allow inline <script> (unsafe)",
+        // The Power BI sandbox blocks external scripts and parser-inserted
+        // <script> never executes; this just stops the tag being stripped.
+        displayName: "Keep inline <script> tags",
         value: false
     });
 

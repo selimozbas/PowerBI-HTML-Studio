@@ -39,6 +39,36 @@ describe("conditionalFormatting", () => {
         expect(evaluateRules(rules, { n: 50 }).style).toBe("color:#ffffff");
     });
 
+    it("colour scale emits nothing for a non-numeric value or a broken scale (M7/M8)", () => {
+        const bad = parseRules('[{"scale":{"field":"S","min":0,"max":100,"minColor":"#000","maxColor":"#fff"}}]').rules;
+        expect(evaluateRules(bad, { S: "n/a" }).style).toBe("");
+        const noBounds = parseRules('[{"scale":{"field":"S","minColor":"#000","maxColor":"#fff"}}]').rules;
+        expect(evaluateRules(noBounds, { S: 50 }).style).toBe("");
+    });
+
+    it("drops style keys / values that could fetch or execute (M12)", () => {
+        const { rules } = parseRules(
+            '[{"field":"x","op":"==","value":"a","style":{"background":"url(https://evil/x.png)","position":"fixed","color":"red"}}]'
+        );
+        const style = evaluateRules(rules, { x: "a" }).style;
+        expect(style).toBe("color:red");
+        expect(style).not.toContain("url(");
+        expect(style).not.toContain("position");
+    });
+
+    it("contains with no value never matches; between handles reversed bounds (M9)", () => {
+        const noVal = parseRules('[{"field":"x","op":"contains","style":{"color":"red"}}]').rules;
+        expect(evaluateRules(noVal, { x: "anything" }).style).toBe("");
+        const rev = parseRules('[{"field":"n","op":"between","value":10,"value2":0,"style":{"color":"red"}}]').rules;
+        expect(evaluateRules(rev, { n: 5 }).style).toBe("color:red");
+    });
+
+    it("date comparisons work in CF (M10)", () => {
+        const { rules } = parseRules('[{"field":"d","op":">","value":"2024-06-01","style":{"color":"red"}}]');
+        expect(evaluateRules(rules, { d: "2024-09-01" }).style).toBe("color:red");
+        expect(evaluateRules(rules, { d: "2024-03-01" }).style).toBe("");
+    });
+
     it("supports between and contains operators", () => {
         const { rules } = parseRules(
             '[{"field":"n","op":"between","value":1,"value2":5,"style":{"color":"red"}},' +

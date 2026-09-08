@@ -10,5 +10,6 @@
   "Debug_NoIssues": "Şablon veya temizleme sorunu yok.",
   "Debug_Rows": "satır",
   "Debug_Fields": "Alanlar",
-  "Debug_Removed": "Temizlemede kaldırılan"
+  "Debug_Removed": "Temizlemede kaldırılan",
+  "Debug_Weakened": "Ekstra izinli etiket / öznitelikler sanitizasyonu zayıflatıyor."
 }

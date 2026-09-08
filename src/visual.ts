@@ -255,6 +255,7 @@ export class Visual implements IVisual {
         const rows = rendered.rows;
         const virtualize = !printMode && !!rendered.rowMapped && !!rows && rows.length > VIRTUALIZE_THRESHOLD;
         let removed: string[] = [];
+        let sanitiserWeakened = false;
 
         if (virtualize && rows) {
             this.rowWindow = new RowWindow({
@@ -265,6 +266,7 @@ export class Visual implements IVisual {
                 renderRange: (start, end) => {
                     const slice = sanitizeToFragment(rows.slice(start, end).map((r) => r.html).join(""), sanOpts);
                     removed = slice.removed;
+                    sanitiserWeakened = slice.weakened;
                     return slice.fragment;
                 },
                 afterRender: () => {
@@ -282,6 +284,7 @@ export class Visual implements IVisual {
         } else {
             const sanitized = sanitizeToFragment(rendered.html, sanOpts);
             removed = sanitized.removed;
+            sanitiserWeakened = sanitized.weakened;
             mountFragment(this.contentEl, sanitized.fragment);
             this.markAuthorObjects();
             this.initFramework();
@@ -337,7 +340,8 @@ export class Visual implements IVisual {
                     templateErrors: rendered.errors,
                     removedTags: removed,
                     rowCount: model.rows.length,
-                    fieldNames: model.fieldNames
+                    fieldNames: model.fieldNames,
+                    sanitiserWeakened
                 },
                 this.translate
             );

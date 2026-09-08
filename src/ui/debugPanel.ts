@@ -4,9 +4,12 @@ import { Translate } from "../i18n";
 
 export interface DebugInfo {
     templateErrors: TemplateError[];
+    /** already-formatted removal labels, e.g. "<script>", "@onclick" */
     removedTags: string[];
     rowCount: number;
     fieldNames: string[];
+    /** true when Extra tags / attributes widened the sanitiser allow-list */
+    sanitiserWeakened?: boolean;
 }
 
 /**
@@ -28,8 +31,15 @@ export function renderDebugPanel(host: HTMLElement, info: DebugInfo, t: Translat
     if (info.removedTags.length) {
         rows.push(
             `<div class="hf-debug-line hf-warn">${escapeHtml(t("Debug_Removed", "Sanitiser removed"))}: ${info.removedTags
-                .map((tag) => `<code>&lt;${escapeHtml(tag)}&gt;</code>`)
+                .map((tag) => `<code>${escapeHtml(tag)}</code>`)
                 .join(" ")}</div>`
+        );
+    }
+    if (info.sanitiserWeakened) {
+        rows.push(
+            `<div class="hf-debug-line hf-warn">${escapeHtml(
+                t("Debug_Weakened", "Extra allowed tags / attributes are widening the sanitiser.")
+            )}</div>`
         );
     }
     for (const err of info.templateErrors) {
@@ -39,7 +49,7 @@ export function renderDebugPanel(host: HTMLElement, info: DebugInfo, t: Translat
             )}</code></div>`
         );
     }
-    if (!info.templateErrors.length && !info.removedTags.length) {
+    if (!info.templateErrors.length && !info.removedTags.length && !info.sanitiserWeakened) {
         rows.push(`<div class="hf-debug-line hf-ok">${escapeHtml(t("Debug_NoIssues", "No template or sanitiser issues."))}</div>`);
     }
     mountTrustedHtml(
