@@ -334,6 +334,18 @@ class AccessibilityCard extends Card {
     slices = [this.ariaLabel];
 }
 
+class BootstrapCard extends Card {
+    enableJs = new formattingSettings.ToggleSwitch({
+        name: "enableJs",
+        displayName: "Interactive components (collapse, tabs, dropdowns, tooltips…)",
+        value: true
+    });
+
+    name = "bootstrap";
+    displayName = "Bootstrap 5";
+    slices = [this.enableJs];
+}
+
 class PerformanceCard extends Card {
     maxRows = new formattingSettings.NumUpDown({
         name: "maxRows",
@@ -370,6 +382,7 @@ export class VisualFormattingSettingsModel extends Model {
     hyperlinks = new HyperlinksCard();
     sanitization = new SanitizationCard();
     theme = new ThemeCard();
+    bootstrap = new BootstrapCard();
     accessibility = new AccessibilityCard();
     performance = new PerformanceCard();
     debug = new DebugCard();
@@ -385,6 +398,7 @@ export class VisualFormattingSettingsModel extends Model {
         this.hyperlinks,
         this.sanitization,
         this.theme,
+        this.bootstrap,
         this.accessibility,
         this.performance,
         this.debug

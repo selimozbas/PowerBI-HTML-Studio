@@ -9,6 +9,10 @@
     "url": "https://github.com/dm-p/powerbi-visuals-html-content"
   },
   "scripts": {
+    "embed-bootstrap": "node scripts/embed-bootstrap.mjs",
+    "prepare": "node scripts/embed-bootstrap.mjs",
+    "prestart": "node scripts/embed-bootstrap.mjs",
+    "prepackage": "node scripts/embed-bootstrap.mjs",
     "start": "pbiviz start",
     "package": "pbiviz package",
     "lint": "eslint src",
@@ -17,12 +21,16 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "dompurify": "^3.1.7",
     "marked": "^18.0.12",
     "monaco-editor": "^0.52.2",
     "powerbi-visuals-api": "~5.11.1"
   },
   "devDependencies": {
+    "@types/bootstrap": "^5.2.11",
     "@typescript-eslint/eslint-plugin": "^8.8.0",
     "@typescript-eslint/parser": "^8.8.0",
     "eslint": "^9.12.0",

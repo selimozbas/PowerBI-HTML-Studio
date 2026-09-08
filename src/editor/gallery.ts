@@ -55,6 +55,49 @@ export const TEMPLATE_GALLERY: TemplateSample[] = [
         ].join("\n")
     },
     {
+        id: "bootstrap-cards",
+        name: "Bootstrap cards",
+        description: "Responsive card grid using the bundled Bootstrap 5 + icons.",
+        template: [
+            '<div class="row g-2">',
+            '  {{#each rows}}',
+            '  <div class="col-sm-6 col-lg-4">',
+            '    <div class="card h-100" {{{selectAttr("content", content)}}}>',
+            '      <div class="card-body">',
+            '        <h6 class="card-title"><i class="bi bi-graph-up-arrow me-1"></i>{{content}}</h6>',
+            '        <p class="display-6 mb-1">{{number(Actual)}}</p>',
+            '        <span class="badge text-bg-{{#if Actual >= Target}}success{{else}}danger{{/if}}">',
+            '          {{percent(pct(Actual, Target), 0)}} of target',
+            '        </span>',
+            '      </div>',
+            '    </div>',
+            '  </div>',
+            '  {{/each}}',
+            '</div>'
+        ].join("\n")
+    },
+    {
+        id: "bootstrap-accordion",
+        name: "Bootstrap accordion",
+        description: "Collapsible sections via Bootstrap's data-bs-* API.",
+        template: [
+            '<div class="accordion" id="hfAcc">',
+            '  {{#each rows}}',
+            '  <div class="accordion-item">',
+            '    <h2 class="accordion-header">',
+            '      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#hfAcc{{@index}}">',
+            '        {{content}}',
+            '      </button>',
+            '    </h2>',
+            '    <div id="hfAcc{{@index}}" class="accordion-collapse collapse" data-bs-parent="#hfAcc">',
+            '      <div class="accordion-body">Actual {{number(Actual)}} &middot; Target {{number(Target)}}</div>',
+            '    </div>',
+            '  </div>',
+            '  {{/each}}',
+            '</div>'
+        ].join("\n")
+    },
+    {
         id: "badge-table",
         name: "Status table",
         description: "Rows with a coloured status pill (pair with Conditional formatting).",

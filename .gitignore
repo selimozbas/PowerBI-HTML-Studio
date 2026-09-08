@@ -1,5 +1,6 @@
 node_modules/
 .tmp/
+src/framework/bootstrapCss.ts
 dist/
 *.pbiviz
 .vscode/

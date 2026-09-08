@@ -34,6 +34,7 @@ import {
     SubSelectableTypeAttribute
 } from "powerbi-visuals-utils-onobjectutils";
 import { getSubSelectionStyles, getSubSelectionShortcuts, HF_OBJECT_MAP } from "./onObject/subSelection";
+import { initBootstrap, disposeBootstrap, injectBootstrapCss, BsDisposable } from "./framework/bootstrapRuntime";
 
 import DialogAction = powerbi.DialogAction;
 import ViewMode = powerbi.ViewMode;
@@ -64,6 +65,7 @@ export class Visual implements IVisual {
     private detachTooltip: (() => void) | null = null;
     private detachLinks: (() => void) | null = null;
     private rowWindow: RowWindow | null = null;
+    private bsInstances: BsDisposable[] = [];
     private componentState: ComponentState = {};
     private lastModel: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, hasData: false };
     private lastRenderKey = "";
@@ -76,6 +78,8 @@ export class Visual implements IVisual {
         this.selectionBinder = new SelectionBinder(this.selectionManager);
         this.tooltipBinder = new TooltipBinder(this.host.tooltipService);
         this.translate = makeTranslator(this.host.createLocalizationManager());
+
+        injectBootstrapCss();
 
         this.root = options.element;
         this.root.classList.add("hf-visual");
@@ -213,6 +217,7 @@ export class Visual implements IVisual {
                 },
                 afterRender: () => {
                     this.markAuthorObjects();
+                    this.initFramework();
                     if (this.allowInteractions()) {
                         this.selectionBinder.applyDim(this.contentEl, this.currentSelectionOptions());
                     }
@@ -223,6 +228,7 @@ export class Visual implements IVisual {
             removed = sanitized.removed;
             mountFragment(this.contentEl, sanitized.fragment);
             this.markAuthorObjects();
+            this.initFramework();
         }
 
         this.contentEl.setAttribute(
@@ -286,6 +292,11 @@ export class Visual implements IVisual {
      * Translate author-placed `data-hf-object="..."` hooks in the rendered
      * content into the real sub-selection attributes the helper understands.
      */
+    private initFramework(): void {
+        disposeBootstrap(this.bsInstances);
+        this.bsInstances = this.settings.bootstrap.enableJs.value ? initBootstrap(this.contentEl) : [];
+    }
+
     private markAuthorObjects(): void {
         this.contentEl.querySelectorAll<HTMLElement>("[data-hf-object]").forEach((el) => {
             const key = (el.getAttribute("data-hf-object") || "").toLowerCase();
@@ -383,6 +394,7 @@ export class Visual implements IVisual {
             maxRows: s.performance.maxRows.value,
             dbg: s.debug.showPanel.value,
             hl: s.hyperlinks.enabled.value,
+            bs: s.bootstrap.enableJs.value,
             cmp: [s.components.enabled.value, s.components.persistState.value],
             cf: [s.conditionalFormatting.enabled.value, s.conditionalFormatting.rules.value],
             san: [
@@ -491,6 +503,8 @@ export class Visual implements IVisual {
         this.detachTooltip?.();
         this.detachLinks?.();
         this.rowWindow?.destroy();
+        disposeBootstrap(this.bsInstances);
+        this.bsInstances = [];
         this.detachComponents = null;
         this.detachSelection = null;
         this.detachTooltip = null;

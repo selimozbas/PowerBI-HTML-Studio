@@ -177,6 +177,11 @@
         "ariaLabel": { "type": { "text": true } }
       }
     },
+    "bootstrap": {
+      "properties": {
+        "enableJs": { "type": { "bool": true } }
+      }
+    },
     "performance": {
       "properties": {
         "maxRows": { "type": { "numeric": true } }
