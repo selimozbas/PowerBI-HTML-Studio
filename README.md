@@ -20,10 +20,14 @@ a lot more built in.
 | Interactivity | Default Power BI **tooltips** for measures in the Tooltips field well |
 | Theming | Active report theme exposed as CSS variables (`--hf-accent`, `--hf-foreground`, …) |
 | Security | **DOMPurify** sanitisation with a configurable allow-list; inline `<script>` only behind an explicit unsafe toggle |
+| DX | **Advanced editor** (modal dialog): Monaco with `{{ }}` syntax highlighting, field/helper autocomplete, a starter-template gallery and a live preview |
 | DX | In-visual **diagnostics panel**: template errors, sanitiser removals, available field names |
 
-Planned next: Monaco advanced editor + template gallery, RTL & locale number
-helpers, `@font-face` embedding, DOM virtualization for very large tables.
+Open the editor from the **✎ Template** button shown on the visual while the
+report is in edit mode; OK writes the template back through `persistProperties`.
+
+Planned next: RTL & locale number helpers, `@font-face` embedding, DOM
+virtualization for very large tables, GitHub Actions CI.
 
 ### Authoring hooks (data- attributes)
 
@@ -53,6 +57,12 @@ src/
     htmlRenderer.ts          orchestration -> HTML string
   interactivity/selection.ts selection manager + context menu binding
   theme/themeVars.ts        report theme -> CSS custom properties
+    markdown.ts             GitHub-flavoured Markdown -> HTML (marked)
+  interactivity/selectMatch.ts data-hf-select spec parser + row matcher
+  interactivity/tooltip.ts  host tooltip service binding
+  editor/                   Monaco (no-worker) setup, hf-template language, gallery
+  dialog/templateEditorDialog.ts  advanced editor modal dialog
+  i18n.ts                   localization-manager translator
   dom/inject.ts             single sanitised-HTML injection point
   ui/debugPanel.ts          diagnostics panel
   landing/landing.ts        first-run landing page

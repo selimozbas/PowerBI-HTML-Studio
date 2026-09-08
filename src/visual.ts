@@ -23,6 +23,10 @@ import { renderDebugPanel } from "./ui/debugPanel";
 import { renderLanding } from "./landing/landing";
 import { mountFragment, clearElement } from "./dom/inject";
 import { makeTranslator, Translate } from "./i18n";
+import { TemplateEditorDialog, EditorInitialState, EditorResultState } from "./dialog/templateEditorDialog";
+
+import DialogAction = powerbi.DialogAction;
+import ViewMode = powerbi.ViewMode;
 
 export class Visual implements IVisual {
     private host: IVisualHost;
@@ -30,6 +34,7 @@ export class Visual implements IVisual {
     private styleEl: HTMLStyleElement;
     private contentEl: HTMLElement;
     private debugEl: HTMLElement;
+    private editBtn: HTMLButtonElement;
 
     private events: IVisualEventService;
     private selectionManager: ISelectionManager;
@@ -43,6 +48,7 @@ export class Visual implements IVisual {
     private detachSelection: (() => void) | null = null;
     private detachTooltip: (() => void) | null = null;
     private componentState: ComponentState = {};
+    private lastModel: ForgeModel = { rows: [], fieldNames: [], contentColumnName: null, hasData: false };
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -63,9 +69,17 @@ export class Visual implements IVisual {
         this.debugEl.className = "hf-debug";
         this.debugEl.hidden = true;
 
+        this.editBtn = document.createElement("button");
+        this.editBtn.className = "hf-edit-btn";
+        this.editBtn.type = "button";
+        this.editBtn.textContent = "✎ Template";
+        this.editBtn.hidden = true;
+        this.editBtn.addEventListener("click", () => this.openTemplateEditor());
+
         this.root.appendChild(this.styleEl);
         this.root.appendChild(this.contentEl);
         this.root.appendChild(this.debugEl);
+        this.root.appendChild(this.editBtn);
 
         this.selectionManager.registerOnSelectCallback(() => {
             this.selectionBinder.applyDim(this.contentEl, this.currentSelectionOptions());
@@ -84,6 +98,8 @@ export class Visual implements IVisual {
             this.restorePersistedState(dataView);
 
             const model: ForgeModel = transform(dataView, this.host);
+            this.lastModel = model;
+            this.editBtn.hidden = options.viewMode !== ViewMode.Edit;
 
             if (!model.hasData && !this.settings.content.noDataMessage.value) {
                 this.teardownDynamic();
@@ -253,6 +269,56 @@ export class Visual implements IVisual {
                 this.componentState = {};
             }
         }
+    }
+
+    private openTemplateEditor(): void {
+        const s = this.settings;
+        const isRow = this.enumValue(s.content.renderMode.value, "aggregate") === "row";
+        const current = isRow
+            ? s.content.rowTemplate.value
+            : s.content.bodyTemplate.value || String(s.content.bodyTemplate.placeholder || "");
+
+        const sampleRows = this.lastModel.rows.slice(0, 25).map((r) => ({
+            ...r.fields,
+            content: r.content,
+            "@index": r.index
+        })) as Record<string, unknown>[];
+
+        const initial: EditorInitialState = {
+            template: current,
+            fieldNames: ["content", ...this.lastModel.fieldNames],
+            sampleRows
+        };
+
+        this.host
+            .openModalDialog(
+                TemplateEditorDialog.id,
+                {
+                    title: "Template editor",
+                    size: { width: 940, height: 580 },
+                    actionButtons: [DialogAction.OK, DialogAction.Cancel]
+                },
+                initial as unknown as object
+            )
+            .then((result) => {
+                if (result.actionId !== DialogAction.OK) return;
+                const text = (result.resultState as EditorResultState)?.template;
+                if (typeof text === "string") this.persistTemplate(isRow ? "rowTemplate" : "bodyTemplate", text);
+            })
+            .catch(() => undefined);
+    }
+
+    private persistTemplate(property: "bodyTemplate" | "rowTemplate", text: string): void {
+        const instances = {
+            merge: [
+                {
+                    objectName: "content",
+                    selector: null,
+                    properties: { contentSource: "template", [property]: text }
+                }
+            ]
+        } as unknown as VisualObjectInstancesToPersist;
+        this.host.persistProperties(instances);
     }
 
     private persistState(): void {

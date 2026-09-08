@@ -1,4 +1,5 @@
 .hf-visual {
+    position: relative;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
@@ -30,6 +31,25 @@
     [data-hf-select].hf-selected {
         outline: 2px solid var(--hf-accent, #118dff);
         outline-offset: 1px;
+    }
+
+    .hf-edit-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        z-index: 5;
+        border: 1px solid var(--hf-track, #e1dfdd);
+        background: var(--hf-background, #fff);
+        color: var(--hf-foreground, #252423);
+        font: 11px "Segoe UI", sans-serif;
+        padding: 2px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        opacity: 0.55;
+    }
+
+    .hf-edit-btn:hover {
+        opacity: 1;
     }
 
     .hf-empty,
